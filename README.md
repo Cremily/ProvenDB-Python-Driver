@@ -1,1 +1,1 @@
-ProvenDB-Python-Driver
+Pyproven: A Python wrapper for ProvenDB!
