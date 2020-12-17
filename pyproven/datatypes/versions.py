@@ -1,11 +1,11 @@
 from collections import UserDict
 from typing import Any, Dict, Optional, Union
 from datetime import datetime
-from pyproven import ProvenDB
 from pyproven.datatypes import exceptions
 class VersionData(UserDict):
-    """ABC for setVersion and getVersion data classes."""
-    def __init__(self,db:ProvenDB,command:str,command_arg:Union[int,str,datetime]):
+    """ABC for setVersion and getVersion data classes. Response fields can be fetched through
+    dict-key access or object attributes."""
+    def __init__(self,db,command:str,command_arg:Union[int,str,datetime]):
         super().__init__(db.command(command,command_arg))
         self.data:Dict[str,Any]
         """raw ProvenDB document returned"""
@@ -34,7 +34,7 @@ class GetVersionData(VersionData):
     :param db: :class:`pyproven.ProvenDB` object to set version on.
     :type db: :class:`pyproven.ProvenDB`
     :see https://provendb.readme.io/docs/getversion"""
-    def __init__(self,db:ProvenDB):
+    def __init__(self,db):
         
         try:
             super().__init__(db,"getVersion",1)
@@ -58,7 +58,7 @@ class SetVersionData(VersionData):
     :param date: Sets db version to the version number or date provided.
     :type date: Union[int,str,datetime]
     :see https://provendb.readme.io/docs/setversion """
-    def __init__(self,db:ProvenDB,date:Union[int,str,datetime]):
+    def __init__(self,db,date:Union[int,str,datetime]):
         """Constructor method for setVersion command results. """
         try:
             super().__init__(db,"setVersion",date)

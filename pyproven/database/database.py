@@ -34,4 +34,4 @@ class ProvenDB():
         :return: A dict-like object representing the ProvenDB return document. 
         :rtype: GetVersionData
         """
-        return GetVersionData()
+        return GetVersionData(self)

@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Dict
 
 from pymongo.errors import PyMongoError
 
@@ -6,7 +6,7 @@ class PyProvenException(Exception):
     """Base class for all PyProven exceptions."""
     def __init__(self,
                 message:str=None, pymongo_exception:PyMongoError=None,
-                proven_err_doc:Dict[int]=None) -> None:
+                proven_err_doc:Dict[str,Any]=None) -> None:
         super().__init__(message)
         self.message = message
         self.mongo_excep = pymongo_exception

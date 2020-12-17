@@ -1,12 +1,10 @@
-import os
-import pymongo
-from src.pyproven.database.database import ProvenDB
-from typing import List,Dict
 if __name__ == "__main__":    
-    if (URI := os.getenv("PROVENDB_URI")) is None:
-        input("Enter ProvenDB URI")
-    if (DATABASE := os.getenv("PROVENDB_DATABASE")) is None:
-        input("Enter ProvenDB database name")
-    client: pymongo.MongoClient = pymongo.MongoClient(URI)
-    db: pymongo.database.Database = client[DATABASE]
-    pdb = ProvenDB(db)
+    import os
+    from pymongo import MongoClient
+    mongoURI = os.getenv("PROVENDB_URI")
+    print(f'connecting w/ URI {mongoURI}')
+    mclient=MongoClient(mongoURI)
+    db=mclient["python-test"]
+    command = {'getVersion':1}
+    getVersionOutput=db.command(command)
+    print('The version is %s' % (getVersionOutput.version))
