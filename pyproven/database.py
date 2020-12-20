@@ -1,12 +1,16 @@
 from datetime import datetime
+
 from typing import Any, Optional, Set, Union, Dict
+
 import pymongo
 from pymongo.errors import OperationFailure, PyMongoError
 import pymongo.message
-from pymongo.database import Database as PymongoDatabase
-from pyproven.versions import GetVersionDocument, ListVersionsDocument
-from pyproven.versions import SetVersionDocument
+import pymongo.database
+
+from pyproven.versions import GetVersionData, ListVersionsData
+from pyproven.versions import SetVersionData
 from pyproven.exceptions import SetVersionException,ListVersionException,GetVersionException
+
 def _fix_op_msg(flags, command, dbname, read_preference, slave_ok, check_keys,
             opts, ctx=None):
     """Get a OP_MSG message."""
@@ -31,9 +35,9 @@ def _fix_op_msg(flags, command, dbname, read_preference, slave_ok, check_keys,
 class ProvenDB():
     """Proven DB Database object that wraps the original pymongo Database object. 
     See :class:`database.ProvenDB` """
-    def __init__(self,database: PymongoDatabase,*args,**kwargs):
+    def __init__(self,database: pymongo.database.Database,*args,**kwargs):
         """Constructor method"""
-        self.db: PymongoDatabase = database
+        self.db: pymongo.database.Database = database
         pymongo.message._op_msg = _fix_op_msg
     def __getattr__(self,name: str) -> Any:
         """Calls :class:`pymongo.database.Database` object attribute or method when none could be found in self.
@@ -44,7 +48,7 @@ class ProvenDB():
         :rtype: Any
         """
         return getattr(self.db,name)
-    def set_version(self,date: Union[str,int,datetime]) -> SetVersionDocument:
+    def set_version(self,date: Union[str,int,datetime]) -> SetVersionData:
         """
 
         :param date: Version number, string literal 'current', or :class:`datetime.datetime` object.
@@ -54,10 +58,10 @@ class ProvenDB():
         """
         try:
             document = self.db.command("setVersion",date)
-            return SetVersionDocument(document)
+            return SetVersionData(document)
         except PyMongoError as e:
             raise SetVersionException(f"Failure to set version {date} on db {self.db.name}.",e) from None
-    def get_version(self) -> GetVersionDocument:
+    def get_version(self) -> GetVersionData:
         """Gets the version the db is set to.
         :see https://provendb.readme.io/docs/getversion
 
@@ -67,7 +71,7 @@ class ProvenDB():
         try:
             document = self.db.command("getVersion",1)
             if document['ok']:
-                return GetVersionDocument(document)
+                return GetVersionData(document)
             else:
                 raise GetVersionException(proven_err_doc=document[''])
         except PyMongoError as e:
@@ -77,7 +81,7 @@ class ProvenDB():
         end_date: Optional[datetime] = None,
         limit: Optional[int] = None,
         sort_direction: Optional[int] = None
-        ) -> ListVersionsDocument:
+        ) -> ListVersionsData:
         """[summary]
 
         :param start_date: [description], defaults to None
@@ -104,6 +108,6 @@ class ProvenDB():
         try:
             document: Dict[str,Any] = self.db.command({"listVersions":command_args})
             if document['ok']:
-                return ListVersionsDocument(document['versions'])
+                return ListVersionsData(document['versions'])
         except PyMongoError as e:
             raise ListVersionException(f"Unable to get version list from {self.db.name}.",e) from None
