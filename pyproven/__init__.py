@@ -1,1 +1,1 @@
-from .database.database import ProvenDB
+from pyproven.database import ProvenDB

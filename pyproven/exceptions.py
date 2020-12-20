@@ -17,11 +17,15 @@ class PyProvenException(Exception):
             explain += f"pymongo raised the following exception {str(self.mongo_excep)}. \n"
         if self.err_doc:
             explain += f"ProvenDB returned the following error document {str(self.err_doc)}"
+        return explain
 class VersionException(PyProvenException):
     """Base class for setVersion and getVersion exceptions."""
 class VersionSetException(PyProvenException):
     """Exception raised when :class:`pyproven.database.database.ProvenDB`
     is given an invalid version argument."""
 class VersionGetException(PyProvenException):
-    """Exception raised when :class:pyproven.database.database.ProvenDB' is unable 
+    """Exception raised when :class:pyproven.`database.database.ProvenDB' is unable 
     to retrieve current version of database."""
+class ListVersionException(PyProvenException):
+    """Exception raised when :class:`pyproven.database.database.ProvenDB` is unable
+    to retrieve the version list of database."""
