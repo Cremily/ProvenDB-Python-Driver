@@ -4,3 +4,4 @@ dist
 pyproven.egg-info
 setup.py
 build
+main.py
