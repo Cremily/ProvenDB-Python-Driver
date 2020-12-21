@@ -59,5 +59,8 @@ class ProvenDBTests(unittest.TestCase):
         versions = self.pdb.list_versions(limit=1)
         self.assertTrue(len(versions)==1)
 
+    def test_doc_history(self):
+        history = self.pdb.doc_history("unit-test",{"a":1})
+        self.assertTrue(history.histories)
 if __name__ == "__main__":
     unittest.main()
