@@ -11,7 +11,6 @@ import pymongo.database
 from pyproven.versions import GetVersionResponse, ListVersionsResponse
 from pyproven.versions import SetVersionResponse,CompactResponse
 from pyproven.exceptions import DocumentHistoryException, PyProvenException, SetVersionException,ListVersionException,GetVersionException
-from pyproven.bulkload import BulkLoadData
 
 def _fix_op_msg(flags, command, dbname, read_preference, slave_ok, check_keys,
             opts, ctx=None):
@@ -42,8 +41,11 @@ class ProvenDB():
         """Constructor method"""
         self.db: pymongo.database.Database = database
         #hack to temp fix issue between pymongo and provendb instances.
-        if kwargs['provendb_hack']:
-            pymongo.message._op_msg = _fix_op_msg
+        try:
+            if kwargs['provendb_hack']:
+                pymongo.message._op_msg = _fix_op_msg
+        except:
+            pass
         
     
     def __getattr__(self,name: str) -> Any:
@@ -54,6 +56,8 @@ class ProvenDB():
         :return: Value from :class:`pymongo.database.Database` attribute or method.
         :rtype: Any
         """
+        return getattr(self.db,name)
+    def __getitem__(self,name:str) -> Any:
         return getattr(self.db,name)
     def doc_history(self,collection:str, filter :Dict[str,Any], 
         projection :Dict[str,Any] = None) -> DocumentHistoryResponse:

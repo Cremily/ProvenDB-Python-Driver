@@ -21,7 +21,7 @@ class ProvenDBTests(unittest.TestCase):
     def setUp(self) -> None:
         self.client = MongoClient(PROVENDB_URI)
         self.db = self.client[PROVENDB_DATABASE]
-        self.pdb = ProvenDB(self.db)
+        self.pdb = ProvenDB(self.db,provendb_hack=True)
     
     def test_proven_constructor(self):
         """Ensures that a ProvenDB object is created."""
@@ -61,6 +61,6 @@ class ProvenDBTests(unittest.TestCase):
 
     def test_doc_history(self):
         history = self.pdb.doc_history("unit-test",{"a":1})
-        self.assertTrue(history.histories)
+        self.assertTrue(history.history)
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(failfast=True)
