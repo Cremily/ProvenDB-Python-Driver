@@ -62,5 +62,9 @@ class ProvenDBTests(unittest.TestCase):
     def test_doc_history(self):
         history = self.pdb.doc_history("unit-test",{"a":1})
         self.assertTrue(history.history)
+    
+    def test_bulk_load(self):
+        load_status = self.pdb.bulk_load("start")
+        self.assertTrue(load_status.status == "")
 if __name__ == "__main__":
     unittest.main(failfast=True)
