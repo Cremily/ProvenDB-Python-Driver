@@ -5,3 +5,4 @@ pyproven.egg-info
 setup.py
 build.py
 .mypy_cache
+main.py

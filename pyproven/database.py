@@ -76,29 +76,29 @@ class ProvenDB():
     
     def bulk_load_start(self) -> BulkLoadStartResponse:
         try:
-            document: Dict[str,Any] = self.db.command("bulkLoad",BulkLoadEnums.START)
+            document: Dict[str,Any] = self.db.command("bulkLoad",BulkLoadEnums.START.value)
             return BulkLoadStartResponse(document)
         except PyMongoError as err:
             raise BulkLoadException(
                 f"Failure to start bulk load on db {self.db.name}",err)  from None
     def bulk_load_stop(self) -> BulkLoadStopResponse:
         try:
-            document: Dict[str,Any] = self.db.command("bulkLoad",BulkLoadEnums.STOP)
-            return BulkLoadStartResponse(document)
+            document: Dict[str,Any] = self.db.command("bulkLoad",BulkLoadEnums.STOP.value)
+            return BulkLoadStopResponse(document)
         except PyMongoError as err:
             raise BulkLoadException(
                 f"Failure to stop bulk load on db {self.db.name}",err)  from None
     def bulk_load_kill(self) -> BulkLoadKillResponse:
         try:
-            document: Dict[str,Any] = self.db.command("bulkLoad",BulkLoadEnums.KILL)
-            return BulkLoadStartResponse(document)
+            document: Dict[str,Any] = self.db.command("bulkLoad",BulkLoadEnums.KILL.value)
+            return BulkLoadKillResponse(document)
         except PyMongoError as err:
             raise BulkLoadException(
                 f"Failure to start bulk load on db {self.db.name}",err)  from None
     def bulk_load_status(self) -> BulkLoadStatusResponse:
         try:
-            document: Dict[str,Any] = self.db.command("bulkLoad",BulkLoadEnums.START)
-            return BulkLoadStartResponse(document)
+            document: Dict[str,Any] = self.db.command("bulkLoad",BulkLoadEnums.STATUS.value)
+            return BulkLoadStatusResponse(document)
         except PyMongoError as err:
             raise BulkLoadException(
                 f"Failure to start bulk load on db {self.db.name}", err)  from None
@@ -159,7 +159,7 @@ class ProvenDB():
         if projection:
             command_args.update({"projection":projection})
         try:
-            document = self._command_helper("docHistory",command_args)
+            document = self.db.command("docHistory",command_args)
             return DocumentHistoryResponse(document)
         except PyMongoError as err:
             raise DocumentHistoryException(f"""
