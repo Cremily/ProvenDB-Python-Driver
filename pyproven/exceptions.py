@@ -43,3 +43,8 @@ class PrepareForgetException(PyProvenException):
 class ExecuteForgetException(PyProvenException):
     """Exception raised when :class:`pyproven.database.ProvenDB` 
     fails to forget a set of documents."""
+class GetDocumentProofException(PyProvenException):
+    """Exception raised when :class:`pyproven.database.ProvenDB`
+    fails to get the proofs of a certain set of documents.
+    This is only raised when the command fails, if individual documents are invalid,
+    the errors will be contained within the response proofs."""

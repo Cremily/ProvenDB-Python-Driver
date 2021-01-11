@@ -1,5 +1,6 @@
 from collections import UserDict
 import datetime
+from pyproven.proofs import GetDocumentProofResponse
 
 
 from typing import Any, Optional, TypeVar, Union, Dict
@@ -8,7 +9,11 @@ from pymongo.database import Database as PymongoDatabase
 from pymongo.errors import PyMongoError
 
 from pyproven.history import DocumentHistoryResponse
-from pyproven.exceptions import BulkLoadException, DocumentHistoryException, GetVersionException, ListVersionException, SetVersionException
+from pyproven.exceptions import (BulkLoadException, CompactException, CreateIgnoredException, 
+                                DocumentHistoryException, 
+                                GetVersionException, 
+                                ListVersionException, PrepareForgetException, 
+                                SetVersionException)
 from pyproven.versions import (GetVersionResponse,
                               SetVersionResponse,
                               CompactResponse,
@@ -17,7 +22,7 @@ from pyproven.versions import (GetVersionResponse,
 from pyproven.utilities import (BulkLoadKillResponse,
                                BulkLoadStartResponse,
                                BulkLoadStatusResponse,
-                               BulkLoadStopResponse,
+                               BulkLoadStopResponse, CreateIgnoredResponse, ExecuteForgetResponse, PrepareForgetResponse,
                                )
 from pyproven.enums import BulkLoadEnums
 def _fix_op_msg(flags, command, dbname, read_preference, slave_ok, check_keys,
@@ -98,6 +103,41 @@ class ProvenDB():
             raise BulkLoadException(
                 f"Failure to start bulk load on db {self.db.name}", err)  from None
 
+    def compact_versions(self,start_version: int, end_version: int) -> CompactResponse:
+        """Compacts all proofs, versions and documents in the db between two given versions,
+        deleting all data that only exists between the two versions.
+
+        :param start_version: The first version to compact from. 
+        :type start_version: int
+        :param end_version: The last version to compact to. 
+        :type end_version: int
+        :raises CompactException: pyproven exception when ProvenDB fails to compact between the two given versions. 
+        :return: A dict-like object containing the number of deleted proofs, versions and documents.
+        :rtype: CompactResponse
+        """
+        command_args = {"startVersion": start_version, "endVersion": end_version}
+        try:
+            response = self.db.command("compact",command_args)
+            return CompactResponse(response)
+        except PyMongoError as err:
+            raise CompactException(
+                f"Failed to compact on {self.db.name} between versions {start_version} and {end_version}.",err
+                ) from None
+    def create_ignored(self, collection: str) -> CreateIgnoredResponse:
+        """Sets a collection to be ignored; it will  be identical among versions, not include metadata, 
+        and not included in proofs.
+
+        :param collection: The name of the collection to be ignored.
+        :type collection: str
+        :return: A dict-like object with the time of the operation.
+        :raises CreateIgnoredException: pyproven exception when database fails to ignore the given collection. 
+        :rtype: CreateIgnoredResponse
+        """
+        try:
+            response = self.db.command("createIgnored",collection)
+            return CreateIgnoredResponse(response)
+        except PyMongoError as err:
+            raise CreateIgnoredException(f"Failed to set collection {collection} on db {self.db.name} to be ignored.",err) from None
     def doc_history(self,collection:str, filter :Dict[str,Any], 
         projection :Dict[str,Any] = None) -> DocumentHistoryResponse:
         """Returns the document history of a filtered collection. 
@@ -113,26 +153,65 @@ class ProvenDB():
         :raises DocumentHistoryException: pyproven exception when ProvenDB fails to retrieve 
                                           the given document history. 
         :return: A dict-like object representing the ProvenDB return document.
-                 See :class:`pyproven.history.DocumentHistoryResponse`. 
         :rtype: DocumentHistoryResponse
         """
-        command = {"collection":collection,"filter":filter}
+        command_args = {"collection":collection,"filter":filter}
         if projection:
-            command.update({"projection":projection})
+            command_args.update({"projection":projection})
         try:
-            document = self._command_helper("docHistory",command)
+            document = self._command_helper("docHistory",command_args)
             return DocumentHistoryResponse(document)
         except PyMongoError as err:
-            raise DocumentHistoryException(
-            self.db.name,command,err) from None
+            raise DocumentHistoryException(f"""
+                Failed to produce history for db {self.db.name} with args {command_args}""", err
+                ) from None
 
+    def forget_prepare(self, collection: str, filter: Dict[str,Any], 
+                        min_version: Optional[int] = 0, max_version: Optional[int] = None,
+                        inclusive_range: bool = True) -> PrepareForgetResponse:
+        if not max_version:
+            max_version = self.get_version()
+        command_args: Dict[str,Any] = {
+            "collection": collection, 
+            "filter": filter, 
+            "minVersion": min_version, 
+            "maxVersion": max_version, 
+            "inclusiveRange":inclusive_range}
+        try:
+            response = self.db.command("forget",{"prepare":command_args})
+            return PrepareForgetResponse(response)
+        except PyMongoError as err:
+            raise PrepareForgetException(f"Failure to prepare a forget operation on db {self.db} with arguments {command_args}",err)
     
+    def forget_execute(self,forget_id: int, password: str) -> ExecuteForgetResponse:
+        command_args: Dict[str,Any] = {"forgetId":forget_id,"password":password}
+        try:
+            response = self.db.command("forget",{"execute":command_args})
+            return ExecuteForgetResponse(response)
+        except PyMongoError as err:
+            raise PrepareForgetException(f"""Failure to execute a forget operation on db {self.db} 
+                                        with password {password} and forget_id {forget_id}""".err)
+    
+    def get_document_proof(self, collection: str, filter: Dict[str,Any], 
+                           version: int, proof_format: Optional[str] = "json"):
+        command_args: Dict[str,Any] = {
+            "collection": collection,
+            "filter":filter,
+            "version":version,
+            "format":proof_format}
+        try: 
+            response = self.db.command("getDocumentProof",command_args)
+            return GetDocumentProofResponse(response)
+        except PyMongoError as err:
+            raise GetDoc
+        
     
 
     def get_version(self) -> GetVersionResponse:
         """Gets the version the db is set to. See https://provendb.readme.io/docs/getversion
 
         :return: A dict-like object representing the ProvenDB return document. 
+        :raises GetVersionException: pyproven exception when db fails to return the current version.
         :rtype: GetVersionData
         """
         try:
@@ -149,6 +228,7 @@ class ProvenDB():
 
         :param date: Version number, string literal 'current', or :class:`datetime.datetime` object.
         :type date: Union[str,int,datetime]
+        :raises SetVersionException: pyproven exception when db fails to set the given version. 
         :return: A dict-like object representing the provenDB return document.
         :rtype: SetVersionData
         """
