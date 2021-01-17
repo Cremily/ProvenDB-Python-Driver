@@ -94,5 +94,5 @@ class GetDocumentProofException(PyProvenException):
 class GetVersionProofException(PyProvenException):
     """Exception raised when :class:`pyproven.database.ProvenDB` fails to get the proof document for a specific version. """
 
-class ListStorageException(ListStorageException):
-    """Exception raised when :class:`pyproven.database.ProvenDB`fails to get the list of storage sizes for each collection in the db. 
+class ListStorageException(PyProvenException):
+    """Exception raised when :class:`pyproven.database.ProvenDB`fails to get the list of storage sizes for each collection in the db. """
