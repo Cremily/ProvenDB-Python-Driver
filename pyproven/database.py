@@ -27,7 +27,8 @@ from pyproven.exceptions import (
     DocumentHistoryException,
     GetDocumentProofException,
     GetVersionException,
-    GetVersionProofException, ListStorageException,
+    GetVersionProofException,
+    ListStorageException,
     ListVersionException,
     PrepareForgetException,
     SetVersionException,
@@ -341,10 +342,11 @@ class ProvenDB:
                 f"Failed to get the given version for proof_id {proof_id} on db {self.db.name}",
                 err,
             )
+
     def list_storage(self) -> ListStorageResponse:
         """Fetches the storage size for each collection in the db.
 
-        :return: A dict-like object holding a list of dict-like objects, 
+        :return: A dict-like object holding a list of dict-like objects,
         each containg a single 'collection_name: collection_storage_size' key-value pair.
         :rtype: ListStorageResponse
         """
@@ -352,7 +354,10 @@ class ProvenDB:
             response = self.db.command("listStorage")
             return ListStorageResponse(response)
         except PyMongoError as err:
-            raise ListStorageException(f"Failed to list storage sizes for db {self.db.name}",err)
+            raise ListStorageException(
+                f"Failed to list storage sizes for db {self.db.name}", err
+            )
+
     def list_versions(
         self,
         start_date: datetime.datetime = datetime.datetime.today()
