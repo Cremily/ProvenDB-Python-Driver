@@ -341,7 +341,18 @@ class ProvenDB:
                 f"Failed to get the given version for proof_id {proof_id} on db {self.db.name}",
                 err,
             )
+    def list_storage(self) -> ListStorageResponse:
+        """Fetches the storage size for each collection in the db.
 
+        :return: A dict-like object holding a list of dict-like objects, 
+        each containg a single 'collection_name: collection_storage_size' key-value pair.
+        :rtype: ListStorageResponse
+        """
+        try:
+            response = self.db.command("listStorage")
+            return ListStorageResponse(response)
+        except PyMongoError as err:
+            raise ListStorageException(f"Failed to list storage sizes for db {self.db.name}",err)
     def list_versions(
         self,
         start_date: datetime.datetime = datetime.datetime.today()
@@ -378,7 +389,6 @@ class ProvenDB:
                 err,
             ) from None
 
-
     def rollback(self) -> RollbackResponse:
         """Rolls back the database to the last valid version, cancelling any current insert, update or delete operations.
 
@@ -390,7 +400,8 @@ class ProvenDB:
             return RollbackResponse(response)
         except PyMongoError as err:
             raise RollbackException(f"Failed to rollback {self.db.name}",err) from None
-    def set_version(
+   
+  def set_version(
         self, date: Union[str, int, datetime.datetime]
     ) -> SetVersionResponse:
         """Sets the database version to a given version identifier.
