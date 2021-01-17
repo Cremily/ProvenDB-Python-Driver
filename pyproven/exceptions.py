@@ -29,28 +29,23 @@ class PyProvenException(Exception):
 
 
 class DocumentHistoryException(PyProvenException):
-    """Exception raised when :class:`pyproven.database.ProvenDB`
-    fails to gather document history."""
+    """Exception raised when :class:`pyproven.database.ProvenDB` fails to gather document history."""
 
 
 class SetVersionException(PyProvenException):
-    """Exception raised when :class:`pyproven.database.ProvenDB`
-    is unable to set db version."""
+    """Exception raised when :class:`pyproven.database.ProvenDB` is unable to set db version."""
 
 
 class GetVersionException(PyProvenException):
-    """Exception raised when :class:pyproven.database.ProvenDB'
-    is unable to retrieve current version of database."""
+    """Exception raised when :class:pyproven.database.ProvenDB' is unable to retrieve current version of database."""
 
 
 class ListVersionException(PyProvenException):
-    """Exception raised when :class:`pyproven.database.ProvenDB`
-    is unable to retrieve the version list of database."""
+    """Exception raised when :class:`pyproven.database.ProvenDB` is unable to retrieve the version list of database."""
 
 
 class BulkLoadException(PyProvenException):
-    """Exception raised when :class:`pyproven.database.ProvenDB`
-    fails to set or get bulk load status."""
+    """Exception raised when :class:`pyproven.database.ProvenDB` fails to set or get bulk load status."""
 
 
 class BulkLoadStartException(BulkLoadException):
@@ -62,7 +57,7 @@ class BulkLoadAlreadyStartedException(BulkLoadStartException):
 
 
 class BulkLoadStopException(BulkLoadException):
-    """Generic exception raised when failing to set  db to stop bulk loading."""
+    """Generic exception raised when failing to set db to stop bulk loading."""
 
 
 class BulkLoadNotStartedException(BulkLoadException):
@@ -94,3 +89,7 @@ class GetDocumentProofException(PyProvenException):
     fails to get the proofs of a certain set of documents.
     This is only raised when the command fails, if individual documents are invalid,
     the errors will be contained within the response proofs."""
+
+
+class GetVersionProofException(PyProvenException):
+    """Exception raised when :class:`pyproven.database.ProvenDB` fails to get the proof document for a specific version. """

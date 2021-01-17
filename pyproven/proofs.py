@@ -1,5 +1,7 @@
 from collections import UserDict
 from typing import Any, Dict, List, Optional, Union
+
+from bson.objectid import ObjectId
 from pyproven.response import ProvenResponse
 from bson import BSON
 
@@ -39,7 +41,19 @@ class SuccessfulDocumentProof(DocumentProof):
         self.proof: Union[BSON, Dict[str, Any]] = self["proof"]
 
 
-def _process_document_proof(document: Dict[str, any]) -> DocumentProof:
+class GetVersionProofResponse(ProvenResponse):
+    def __init__(self, document: Dict[str, Any]):
+        super().__init__(document)
+        self.proofs = [VersionProof(proof) for proof in self["proofs"]]
+
+
+class VersionProof(UserDict):
+    def __init__(self, document: Dict[str, Any]):
+        self._id: ObjectId = self["_id"]
+        self.proofId: str = self["proofId"]
+
+
+def _process_document_proof(document: Dict[str, Any]) -> DocumentProof:
     if "errmsg" in document.keys():
         return FailedDocumentProof(document)
     else:

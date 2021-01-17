@@ -1,6 +1,12 @@
 from collections import UserDict
 import datetime
-from pyproven.proofs import GetDocumentProofResponse
+
+from bson.son import SON
+from pyproven.proofs import (
+    GetDocumentProofResponse,
+    GetVersionProofResponse,
+    _process_document_proof,
+)
 
 
 from typing import Any, Optional, TypeVar, Union, Dict
@@ -11,13 +17,16 @@ from pymongo.errors import PyMongoError
 from pyproven.history import DocumentHistoryResponse
 from pyproven.exceptions import (
     BulkLoadAlreadyStartedException,
-    BulkLoadException, BulkLoadNotStartedException,
-    BulkLoadStartException, BulkLoadStopException,
+    BulkLoadException,
+    BulkLoadNotStartedException,
+    BulkLoadStartException,
+    BulkLoadStopException,
     CompactException,
     CreateIgnoredException,
     DocumentHistoryException,
     GetDocumentProofException,
     GetVersionException,
+    GetVersionProofException,
     ListVersionException,
     PrepareForgetException,
     SetVersionException,
@@ -39,6 +48,8 @@ from pyproven.utilities import (
     PrepareForgetResponse,
 )
 from pyproven.enums import BulkLoadEnums
+
+from bson import BSON
 
 
 def _fix_op_msg(
@@ -127,7 +138,9 @@ class ProvenDB:
         :rtype: BulkLoadStopResponse
         """
         if self.bulk_load_status().status == "off":
-            raise BulkLoadNotStartedException("Attempted to stop a bulk load on db {self.db.name}, but the db isn't currently bulk loading.")
+            raise BulkLoadNotStartedException(
+                "Attempted to stop a bulk load on db {self.db.name}, but the db isn't currently bulk loading."
+            )
         try:
             document: Dict[str, Any] = self.db.command(
                 "bulkLoad", BulkLoadEnums.STOP.value
@@ -140,7 +153,9 @@ class ProvenDB:
 
     def bulk_load_kill(self) -> BulkLoadKillResponse:
         if self.bulk_load_status().status == "off":
-            raise BulkLoadNotStartedException("Attempted to kill a bulk load on db {self.db.name}, but the db isn't currently bulk loading.")
+            raise BulkLoadNotStartedException(
+                "Attempted to kill a bulk load on db {self.db.name}, but the db isn't currently bulk loading."
+            )
         try:
             document: Dict[str, Any] = self.db.command(
                 "bulkLoad", BulkLoadEnums.KILL.value
@@ -258,7 +273,7 @@ class ProvenDB:
             raise PrepareForgetException(
                 f"Failure to prepare a forget operation on db {self.db} with arguments {command_args}",
                 err,
-            )
+            ) from None
 
     def forget_execute(self, forget_id: int, password: str) -> ExecuteForgetResponse:
         command_args: Dict[str, Any] = {"forgetId": forget_id, "password": password}
@@ -269,7 +284,7 @@ class ProvenDB:
             raise PrepareForgetException(
                 f"""Failure to execute a forget operation on db {self.db} 
                                         with password {password} and forget_id {forget_id}""".err
-            )
+            ) from None
 
     def get_document_proof(
         self,
@@ -291,7 +306,7 @@ class ProvenDB:
             raise GetDocumentProofException(
                 f"""Failed to get proof for documents on {self.db.name} with arguments {command_args}""",
                 err,
-            )
+            ) from None
 
     def get_version(self) -> GetVersionResponse:
         """Gets the version the db is set to. See https://provendb.readme.io/docs/getversion
@@ -308,34 +323,31 @@ class ProvenDB:
                 f"Failure to get version from db {self.db.name}.", pymongo_exception=err
             ) from None
 
-    def set_version(
-        self, date: Union[str, int, datetime.datetime]
-    ) -> SetVersionResponse:
-        """Sets the database version to a given version identifier.
-
-        :param date: Version number, string literal 'current', or :class:`datetime.datetime` object.
-        :type date: Union[str,int,datetime]
-        :raises SetVersionException: pyproven exception when db fails to set the given version.
-        :return: A dict-like object representing the provenDB return document.
-        :rtype: SetVersionData
-        """
+    def get_version_proof(
+        self,
+        proof_id: Union[str, int],
+        proof_format: str = "binary",
+        list_collections: bool = False,
+    ) -> GetVersionProofResponse:
+        command_args: SON = SON({"getProof": proof_id})
+        command_args.update({"format": proof_format})
+        command_args.update({"listCollections": list_collections})
         try:
-            document = self.db.command("setVersion", date)
-            return SetVersionResponse(document)
-        except PyMongoError as e:
-            raise SetVersionException(
-                f"Failure to set version {date} on db {self.db.name}"
-                + f"with date {date}.",
-                e,
-            ) from None
+            document = self.db.command(command_args)
+            return GetVersionProofResponse(document)
+        except PyMongoError as err:
+            raise GetVersionProofException(
+                f"Failed to get the given version for proof_id {proof_id} on db {self.db.name}",
+                err,
+            )
 
     def list_versions(
         self,
-        start_date: Optional[datetime.datetime] = datetime.datetime.today()
+        start_date: datetime.datetime = datetime.datetime.today()
         - datetime.timedelta(days=1),
-        end_date: Optional[datetime.datetime] = datetime.datetime.today(),
-        limit: Optional[int] = 10,
-        sort_direction: Optional[int] = -1,
+        end_date: datetime.datetime = datetime.datetime.today(),
+        limit: int = 10,
+        sort_direction: int = -1,
     ) -> ListVersionsResponse:
         """Retrieves a list of versions given a search parameter.
         :param start_date: Specifies first date to retrieve versions, defaults to 24 hours from now
@@ -363,4 +375,25 @@ class ProvenDB:
             raise ListVersionException(
                 f"Unable to get version list from {self.db.name} with arguments {command_args}.",
                 err,
+            ) from None
+
+    def set_version(
+        self, date: Union[str, int, datetime.datetime]
+    ) -> SetVersionResponse:
+        """Sets the database version to a given version identifier.
+
+        :param date: Version number, string literal 'current', or :class:`datetime.datetime` object.
+        :type date: Union[str,int,datetime]
+        :raises SetVersionException: pyproven exception when db fails to set the given version.
+        :return: A dict-like object representing the provenDB return document.
+        :rtype: SetVersionData
+        """
+        try:
+            document = self.db.command("setVersion", date)
+            return SetVersionResponse(document)
+        except PyMongoError as e:
+            raise SetVersionException(
+                f"Failure to set version {date} on db {self.db.name}"
+                + f"with date {date}.",
+                e,
             ) from None
