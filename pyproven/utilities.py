@@ -86,10 +86,14 @@ class ExecuteForgetResponse(ProvenResponse):
             document["forgetSummary"]
         )
 
+
 class RollbackResponse(ProvenResponse):
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
-        self.version: List[RollbackVersion] = [RollbackVersion(i) for i in self['version']]
+        self.version: List[RollbackVersion] = [
+            RollbackVersion(i) for i in self["version"]
+        ]
+
 
 class RollbackVersion(UserDict):
     """Dict-like object holding the 'db_name: db_version' key-value pair given by `:class:pyproven.database.ProvenDB.rollback()`"""

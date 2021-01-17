@@ -30,7 +30,8 @@ from pyproven.exceptions import (
     GetVersionProofException,
     ListStorageException,
     ListVersionException,
-    PrepareForgetException, RollbackException,
+    PrepareForgetException,
+    RollbackException,
     SetVersionException,
 )
 from pyproven.versions import (
@@ -47,7 +48,8 @@ from pyproven.utilities import (
     BulkLoadStopResponse,
     CreateIgnoredResponse,
     ExecuteForgetResponse,
-    PrepareForgetResponse, RollbackResponse,
+    PrepareForgetResponse,
+    RollbackResponse,
 )
 from pyproven.enums import BulkLoadEnums
 
@@ -404,9 +406,9 @@ class ProvenDB:
             response = self.db.command("rollback")
             return RollbackResponse(response)
         except PyMongoError as err:
-            raise RollbackException(f"Failed to rollback {self.db.name}",err) from None
-   
-  def set_version(
+            raise RollbackException(f"Failed to rollback {self.db.name}", err) from None
+
+    def set_version(
         self, date: Union[str, int, datetime.datetime]
     ) -> SetVersionResponse:
         """Sets the database version to a given version identifier.
