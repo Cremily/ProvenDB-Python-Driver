@@ -29,7 +29,7 @@ from pyproven.exceptions import (
     GetVersionException,
     GetVersionProofException, ListStorageException,
     ListVersionException,
-    PrepareForgetException,
+    PrepareForgetException, RollbackException,
     SetVersionException,
 )
 from pyproven.versions import (
@@ -46,7 +46,7 @@ from pyproven.utilities import (
     BulkLoadStopResponse,
     CreateIgnoredResponse,
     ExecuteForgetResponse,
-    PrepareForgetResponse,
+    PrepareForgetResponse, RollbackResponse,
 )
 from pyproven.enums import BulkLoadEnums
 
@@ -378,19 +378,18 @@ class ProvenDB:
                 err,
             ) from None
 
-    def list_storage(self) -> ListStorageResponse:
-        """Fetches the storage size for each collection in the db.
 
-        :return: A dict-like object holding a list of dict-like objects, 
-        each containg a single 'collection_name: collection_storage_size' key-value pair.
-        :rtype: ListStorageResponse
+    def rollback(self) -> RollbackResponse:
+        """Rolls back the database to the last valid version, cancelling any current insert, update or delete operations.
+
+        :return: A dict-like object holding the 'db_name: db_version` pair the db has been rolled back to.
+        :rtype: RollbackResponse
         """
         try:
-            response = self.db.command("listStorage")
-            return ListStorageResponse(response)
+            response = self.db.command("rollback")
+            return RollbackResponse(response)
         except PyMongoError as err:
-            raise ListStorageException(f"Failed to list storage sizes for db {self.db.name}",err)
-
+            raise RollbackException(f"Failed to rollback {self.db.name}",err) from None
     def set_version(
         self, date: Union[str, int, datetime.datetime]
     ) -> SetVersionResponse:
