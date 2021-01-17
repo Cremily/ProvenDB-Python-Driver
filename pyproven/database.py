@@ -1,6 +1,5 @@
 from collections import UserDict
 import datetime
-from pyproven.storage import ListStorageResponse
 
 from bson.son import SON
 from pyproven.proofs import (
@@ -27,7 +26,7 @@ from pyproven.exceptions import (
     DocumentHistoryException,
     GetDocumentProofException,
     GetVersionException,
-    GetVersionProofException, ListStorageException,
+    GetVersionProofException,
     ListVersionException,
     PrepareForgetException,
     SetVersionException,
@@ -377,19 +376,6 @@ class ProvenDB:
                 f"Unable to get version list from {self.db.name} with arguments {command_args}.",
                 err,
             ) from None
-
-    def list_storage(self) -> ListStorageResponse:
-        """Fetches the storage size for each collection in the db.
-
-        :return: A dict-like object holding a list of dict-like objects, 
-        each containg a single 'collection_name: collection_storage_size' key-value pair.
-        :rtype: ListStorageResponse
-        """
-        try:
-            response = self.db.command("listStorage")
-            return ListStorageResponse(response)
-        except PyMongoError as err:
-            raise ListStorageException(f"Failed to list storage sizes for db {self.db.name}",err)
 
     def set_version(
         self, date: Union[str, int, datetime.datetime]
