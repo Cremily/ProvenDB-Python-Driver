@@ -115,6 +115,7 @@ class ProvenDB:
 
     def bulk_load_start(self) -> BulkLoadStartResponse:
         """Starts a bulk load on the database. Bulk loads allow multiple inserts without incrementing the version.
+        See https://provendb.readme.io/docs/bulkload
 
         :raises BulkLoadException: A PyProven exception raised when db fails to start bulk loading, usually because the db is already bulk loading.
         :return: A dict-like object that holds the current version.
@@ -136,9 +137,11 @@ class ProvenDB:
 
     def bulk_load_stop(self) -> BulkLoadStopResponse:
         """Stops a bulk load on a database, failing if there is any outstanding operations.
+        See https://provendb.readme.io/docs/bulkload
 
+        :raises BulkLoadNotStartedException: Error when trying to stop a bulk load when the database is not bulk loading. 
         :raises BulkLoadException: A PyProven exception when failing to stop a bulk load.
-        :return: [description]
+        :return: A dict-like object representing the response from the database. 
         :rtype: BulkLoadStopResponse
         """
         if self.bulk_load_status().status == "off":
@@ -156,6 +159,14 @@ class ProvenDB:
             ) from None
 
     def bulk_load_kill(self) -> BulkLoadKillResponse:
+        """Stops a bulk load on a database, killing any remaining operations.
+        See https://provendb.readme.io/docs/bulkload
+
+        :raises BulkLoadNotStartedException: Error when attempting to kill a bulk load when one hasn't started.
+        :raises BulkLoadException: Default exception when database fails to kill a bulkload. 
+        :return: A dict-like object containing the response from the database. 
+        :rtype: BulkLoadKillResponse
+        """
         if self.bulk_load_status().status == "off":
             raise BulkLoadNotStartedException(
                 "Attempted to kill a bulk load on db {self.db.name}, but the db isn't currently bulk loading."
@@ -171,6 +182,13 @@ class ProvenDB:
             ) from None
 
     def bulk_load_status(self) -> BulkLoadStatusResponse:
+        """Returns the current bulk load status of the database. 
+        See https://provendb.readme.io/docs/bulkload
+
+        :raises BulkLoadException: Generic error when database fails to check bulk load status.
+        :return: A dict-like object holding the current bulk load status of the database. 
+        :rtype: BulkLoadStatusResponse
+        """
         try:
             document: Dict[str, Any] = self.db.command(
                 "bulkLoad", BulkLoadEnums.STATUS.value
@@ -178,12 +196,13 @@ class ProvenDB:
             return BulkLoadStatusResponse(document)
         except PyMongoError as err:
             raise BulkLoadException(
-                f"Failure to start bulk load on db {self.db.name}", err
+                f"Failure to check bulk load status on db {self.db.name}", err
             ) from None
 
     def compact_versions(self, start_version: int, end_version: int) -> CompactResponse:
         """Compacts all proofs, versions and documents in the db between two given versions,
         deleting all data that only exists between the two versions.
+        See https://provendb.readme.io/docs/compact
 
         :param start_version: The first version to compact from.
         :type start_version: int
@@ -206,6 +225,7 @@ class ProvenDB:
     def create_ignored(self, collection: str) -> CreateIgnoredResponse:
         """Sets a collection to be ignored; it will  be identical among versions, not include metadata,
         and not included in proofs.
+        See https://provendb.readme.io/docs/ignored-collections
 
         :param collection: The name of the collection to be ignored.
         :type collection: str
@@ -226,7 +246,7 @@ class ProvenDB:
         self, collection: str, filter: Dict[str, Any], projection: Dict[str, Any] = None
     ) -> DocumentHistoryResponse:
         """Returns the document history of a filtered collection.
-            See https://provendb.readme.io/docs/dochistory
+        See https://provendb.readme.io/docs/dochistory
 
         :param collection: Name of collection to find history.
         :type collection: str
@@ -257,10 +277,28 @@ class ProvenDB:
         self,
         collection: str,
         filter: Dict[str, Any],
-        min_version: Optional[int] = 0,
+        min_version: Optional[int] = None,
         max_version: Optional[int] = None,
         inclusive_range: bool = True,
     ) -> PrepareForgetResponse:
+        """Prepares an operation to forget a set of documents. This will erase the data but preserve hashes so as to verify proofs.
+        See https://provendb.readme.io/docs/forget
+
+        :param collection: The name of the collection to forget documents from.
+        :type collection: str
+        :param filter: A filter that choses the specific documents to forget. 
+        :type filter: Dict[str, Any]
+        :param min_version: Minimum version to forget documents in. Defaults to first version of database.
+        :type min_version: Optional[int], optional
+        :param max_version: Maximum verstion to forget documents to. Defaults to current version of database.
+        :type max_version: Optional[int], optional
+        :param inclusive_range: If true, only forget documents that ONLY exist between the two versions, defaults to True
+        :type inclusive_range: bool, optional
+        :raises PrepareForgetException: Generic error when failing to prepare forget operation on database.
+        :return: A dict-like object that holds the forget password as well as forget summary. 
+        :rtype: PrepareForgetResponse
+        """
+        #get_version can't be called as a default param, so must be done within func. 
         if not max_version:
             max_version = self.get_version()
         command_args: Dict[str, Any] = {
@@ -280,6 +318,17 @@ class ProvenDB:
             ) from None
 
     def forget_execute(self, forget_id: int, password: str) -> ExecuteForgetResponse:
+        """Executes a prepared forget operation, deleting data but preserving hashes. 
+        See https://provendb.readme.io/docs/forget
+
+        :param forget_id: Id given in prepare operation. 
+        :type forget_id: int
+        :param password: Password given in prepare operation. 
+        :type password: str
+        :raises PrepareForgetException: Generic exception when database fails to execute a forget operation.
+        :return: A dict-like object returning the status and summary of the forget operation.
+        :rtype: ExecuteForgetResponse
+        """        
         command_args: Dict[str, Any] = {"forgetId": forget_id, "password": password}
         try:
             response = self.db.command("forget", {"execute": command_args})
@@ -287,7 +336,7 @@ class ProvenDB:
         except PyMongoError as err:
             raise PrepareForgetException(
                 f"""Failure to execute a forget operation on db {self.db} 
-                                        with password {password} and forget_id {forget_id}""".err
+                                        with password {password} and forget_id {forget_id}""",err
             ) from None
 
     def get_document_proof(
@@ -295,8 +344,22 @@ class ProvenDB:
         collection: str,
         filter: Dict[str, Any],
         version: int,
-        proof_format: Optional[str] = "json",
-    ):
+        proof_format: str = "json",
+    ) -> GetDocumentProofResponse:
+        """Filters documents in a collection and returns any proofs of those documents for a given version. 
+
+        :param collection: The name of the collection to filter.
+        :type collection: str
+        :param filter: A mongodb filter that subsets the collection.
+        :type filter: Dict[str, Any]
+        :param version: The version number to fetch proofs for. 
+        :type version: int
+        :param proof_format: The format of the proof, either 'binary' or 'json', defaults to "json"
+        :type proof_format: str
+        :raises GetDocumentProofException: [description]
+        :return: A dict-like object containing an array of document proof documents. 
+        :rtype: GetDocumentProofResponse
+        """    
         command_args: Dict[str, Any] = {
             "collection": collection,
             "filter": filter,
@@ -333,6 +396,18 @@ class ProvenDB:
         proof_format: str = "binary",
         list_collections: bool = False,
     ) -> GetVersionProofResponse:
+        """Gets a proof for a specific database version. 
+
+        :param proof_id: Either a string matching a proofId, or a version number.
+        :type proof_id: Union[str, int]
+        :param proof_format: Format type of proof, either 'binary' or 'json', defaults to "binary"
+        :type proof_format: str
+        :param list_collections: If True all collections in proof are listed, defaults to False.
+        :type list_collections: bool, optional
+        :raises GetVersionProofException: 
+        :return: A dict-like object holding an array of proofs. 
+        :rtype: GetVersionProofResponse
+        """
         command_args: SON = SON({"getProof": proof_id})
         command_args.update({"format": proof_format})
         command_args.update({"listCollections": list_collections})
@@ -399,7 +474,7 @@ class ProvenDB:
     def rollback(self) -> RollbackResponse:
         """Rolls back the database to the last valid version, cancelling any current insert, update or delete operations.
 
-        :return: A dict-like object holding the 'db_name: db_version` pair the db has been rolled back to.
+        :return: A dict-like object holding the 'db_name: db_version' pair the db has been rolled back to.
         :rtype: RollbackResponse
         """
         try:
