@@ -52,6 +52,11 @@ class VersionProof(UserDict):
         self._id: ObjectId = self["_id"]
         self.proofId: str = self["proofId"]
 
+class SubmitProofResponse(ProvenResponse):
+    def __init__(self, document: Dict[str, Any]):
+        super().__init__(document)
+        raise NotImplementedError()
+
 
 def _process_document_proof(document: Dict[str, Any]) -> DocumentProof:
     if "errmsg" in document.keys():
