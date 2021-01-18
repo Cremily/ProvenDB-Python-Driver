@@ -97,6 +97,11 @@ class ProvenDBTests(unittest.TestCase):
         for col_name in collection_list:
             self.assertTrue(_collection_in_storage_doc(col_name, storage_list))
 
+    def test_metadata_shows(self):
+        self.pdb.show_metadata()
+        self.assertTrue('_provendb_metadata' in self.pdb['unit-test'].find_one())
+        self.pdb.hide_metadata()
+        self.assertTrue('provendb_metadata' not in self.pdb['unit-test'].find_one())
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,7 @@
 from collections import UserDict
 import datetime
+
+from pymongo.collection import Collection
 from pyproven.storage import ListStorageResponse
 
 from bson.son import SON
@@ -47,9 +49,9 @@ from pyproven.utilities import (
     BulkLoadStatusResponse,
     BulkLoadStopResponse,
     CreateIgnoredResponse,
-    ExecuteForgetResponse,
+    ExecuteForgetResponse, HideMetadataResponse,
     PrepareForgetResponse,
-    RollbackResponse,
+    RollbackResponse, ShowMetadataResponse,
 )
 from pyproven.enums import BulkLoadEnums
 
@@ -110,8 +112,8 @@ class ProvenDB:
         """
         return getattr(self.db, name)
 
-    def __getitem__(self, name: str) -> Any:
-        return getattr(self.db, name)
+    def __getitem__(self, name: Any) -> Collection:
+        return self.db[name]
 
     def bulk_load_start(self) -> BulkLoadStartResponse:
         """Starts a bulk load on the database. Bulk loads allow multiple inserts without incrementing the version.
@@ -503,3 +505,17 @@ class ProvenDB:
                 + f"with date {date}.",
                 e,
             ) from None
+
+    def show_metadata(self) -> ShowMetadataResponse:
+        try:
+            response = self.db.command("showMetadata",True)
+            return ShowMetadataResponse(response)
+        except PyMongoError as err:
+            print(f"Failed to show metatdata on db {self.db.name}",err)
+    
+    def hide_metadata(self) -> HideMetadataResponse:
+        try:
+            response = self.db.command("showMetadata",False)
+            return HideMetadataResponse(response)
+        except PyMongoError as err:
+            print(f"Failed to hide metatdata on db {self.db.name}",err)

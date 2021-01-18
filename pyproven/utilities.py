@@ -97,3 +97,9 @@ class RollbackResponse(ProvenResponse):
 
 class RollbackVersion(UserDict):
     """Dict-like object holding the 'db_name: db_version' key-value pair given by `:class:pyproven.database.ProvenDB.rollback()`"""
+
+class ShowMetadataResponse(ProvenResponse):
+    """Dict like object holding the ok response from the database."""
+
+class HideMetadataResponse(ProvenResponse):
+    """Dict like object holding the ok response from the database."""
