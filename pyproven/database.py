@@ -49,9 +49,11 @@ from pyproven.utilities import (
     BulkLoadStatusResponse,
     BulkLoadStopResponse,
     CreateIgnoredResponse,
-    ExecuteForgetResponse, HideMetadataResponse,
+    ExecuteForgetResponse,
+    HideMetadataResponse,
     PrepareForgetResponse,
-    RollbackResponse, ShowMetadataResponse,
+    RollbackResponse,
+    ShowMetadataResponse,
 )
 from pyproven.enums import BulkLoadEnums
 
@@ -141,9 +143,9 @@ class ProvenDB:
         """Stops a bulk load on a database, failing if there is any outstanding operations.
         See https://provendb.readme.io/docs/bulkload
 
-        :raises BulkLoadNotStartedException: Error when trying to stop a bulk load when the database is not bulk loading. 
+        :raises BulkLoadNotStartedException: Error when trying to stop a bulk load when the database is not bulk loading.
         :raises BulkLoadException: A PyProven exception when failing to stop a bulk load.
-        :return: A dict-like object representing the response from the database. 
+        :return: A dict-like object representing the response from the database.
         :rtype: BulkLoadStopResponse
         """
         if self.bulk_load_status().status == "off":
@@ -165,8 +167,8 @@ class ProvenDB:
         See https://provendb.readme.io/docs/bulkload
 
         :raises BulkLoadNotStartedException: Error when attempting to kill a bulk load when one hasn't started.
-        :raises BulkLoadException: Default exception when database fails to kill a bulkload. 
-        :return: A dict-like object containing the response from the database. 
+        :raises BulkLoadException: Default exception when database fails to kill a bulkload.
+        :return: A dict-like object containing the response from the database.
         :rtype: BulkLoadKillResponse
         """
         if self.bulk_load_status().status == "off":
@@ -184,11 +186,11 @@ class ProvenDB:
             ) from None
 
     def bulk_load_status(self) -> BulkLoadStatusResponse:
-        """Returns the current bulk load status of the database. 
+        """Returns the current bulk load status of the database.
         See https://provendb.readme.io/docs/bulkload
 
         :raises BulkLoadException: Generic error when database fails to check bulk load status.
-        :return: A dict-like object holding the current bulk load status of the database. 
+        :return: A dict-like object holding the current bulk load status of the database.
         :rtype: BulkLoadStatusResponse
         """
         try:
@@ -288,7 +290,7 @@ class ProvenDB:
 
         :param collection: The name of the collection to forget documents from.
         :type collection: str
-        :param filter: A filter that choses the specific documents to forget. 
+        :param filter: A filter that choses the specific documents to forget.
         :type filter: Dict[str, Any]
         :param min_version: Minimum version to forget documents in. Defaults to first version of database.
         :type min_version: Optional[int], optional
@@ -297,10 +299,10 @@ class ProvenDB:
         :param inclusive_range: If true, only forget documents that ONLY exist between the two versions, defaults to True
         :type inclusive_range: bool, optional
         :raises PrepareForgetException: Generic error when failing to prepare forget operation on database.
-        :return: A dict-like object that holds the forget password as well as forget summary. 
+        :return: A dict-like object that holds the forget password as well as forget summary.
         :rtype: PrepareForgetResponse
         """
-        #get_version can't be called as a default param, so must be done within func. 
+        # get_version can't be called as a default param, so must be done within func.
         if not max_version:
             max_version = self.get_version()
         command_args: Dict[str, Any] = {
@@ -320,17 +322,17 @@ class ProvenDB:
             ) from None
 
     def forget_execute(self, forget_id: int, password: str) -> ExecuteForgetResponse:
-        """Executes a prepared forget operation, deleting data but preserving hashes. 
+        """Executes a prepared forget operation, deleting data but preserving hashes.
         See https://provendb.readme.io/docs/forget
 
-        :param forget_id: Id given in prepare operation. 
+        :param forget_id: Id given in prepare operation.
         :type forget_id: int
-        :param password: Password given in prepare operation. 
+        :param password: Password given in prepare operation.
         :type password: str
         :raises PrepareForgetException: Generic exception when database fails to execute a forget operation.
         :return: A dict-like object returning the status and summary of the forget operation.
         :rtype: ExecuteForgetResponse
-        """        
+        """
         command_args: Dict[str, Any] = {"forgetId": forget_id, "password": password}
         try:
             response = self.db.command("forget", {"execute": command_args})
@@ -338,7 +340,8 @@ class ProvenDB:
         except PyMongoError as err:
             raise PrepareForgetException(
                 f"""Failure to execute a forget operation on db {self.db} 
-                                        with password {password} and forget_id {forget_id}""",err
+                                        with password {password} and forget_id {forget_id}""",
+                err,
             ) from None
 
     def get_document_proof(
@@ -348,20 +351,20 @@ class ProvenDB:
         version: int,
         proof_format: str = "json",
     ) -> GetDocumentProofResponse:
-        """Filters documents in a collection and returns any proofs of those documents for a given version. 
+        """Filters documents in a collection and returns any proofs of those documents for a given version.
 
         :param collection: The name of the collection to filter.
         :type collection: str
         :param filter: A mongodb filter that subsets the collection.
         :type filter: Dict[str, Any]
-        :param version: The version number to fetch proofs for. 
+        :param version: The version number to fetch proofs for.
         :type version: int
         :param proof_format: The format of the proof, either 'binary' or 'json', defaults to "json"
         :type proof_format: str
         :raises GetDocumentProofException: [description]
-        :return: A dict-like object containing an array of document proof documents. 
+        :return: A dict-like object containing an array of document proof documents.
         :rtype: GetDocumentProofResponse
-        """    
+        """
         command_args: Dict[str, Any] = {
             "collection": collection,
             "filter": filter,
@@ -398,7 +401,7 @@ class ProvenDB:
         proof_format: str = "binary",
         list_collections: bool = False,
     ) -> GetVersionProofResponse:
-        """Gets a proof for a specific database version. 
+        """Gets a proof for a specific database version.
 
         :param proof_id: Either a string matching a proofId, or a version number.
         :type proof_id: Union[str, int]
@@ -406,8 +409,8 @@ class ProvenDB:
         :type proof_format: str
         :param list_collections: If True all collections in proof are listed, defaults to False.
         :type list_collections: bool, optional
-        :raises GetVersionProofException: 
-        :return: A dict-like object holding an array of proofs. 
+        :raises GetVersionProofException:
+        :return: A dict-like object holding an array of proofs.
         :rtype: GetVersionProofResponse
         """
         command_args: SON = SON({"getProof": proof_id})
@@ -508,14 +511,14 @@ class ProvenDB:
 
     def show_metadata(self) -> ShowMetadataResponse:
         try:
-            response = self.db.command("showMetadata",True)
+            response = self.db.command("showMetadata", True)
             return ShowMetadataResponse(response)
         except PyMongoError as err:
-            print(f"Failed to show metatdata on db {self.db.name}",err)
-    
+            print(f"Failed to show metatdata on db {self.db.name}", err)
+
     def hide_metadata(self) -> HideMetadataResponse:
         try:
-            response = self.db.command("showMetadata",False)
+            response = self.db.command("showMetadata", False)
             return HideMetadataResponse(response)
         except PyMongoError as err:
-            print(f"Failed to hide metatdata on db {self.db.name}",err)
+            print(f"Failed to hide metatdata on db {self.db.name}", err)
