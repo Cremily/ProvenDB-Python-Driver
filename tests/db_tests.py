@@ -99,9 +99,10 @@ class ProvenDBTests(unittest.TestCase):
 
     def test_metadata_shows(self):
         self.pdb.show_metadata()
-        self.assertTrue('_provendb_metadata' in self.pdb['unit-test'].find_one())
+        self.assertTrue("_provendb_metadata" in self.pdb["unit-test"].find_one())
         self.pdb.hide_metadata()
-        self.assertTrue('provendb_metadata' not in self.pdb['unit-test'].find_one())
+        self.assertTrue("provendb_metadata" not in self.pdb["unit-test"].find_one())
+
 
 if __name__ == "__main__":
     unittest.main()
