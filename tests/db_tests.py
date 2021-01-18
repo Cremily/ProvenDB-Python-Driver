@@ -98,6 +98,7 @@ class ProvenDBTests(unittest.TestCase):
             self.assertTrue(_collection_in_storage_doc(col_name, storage_list))
 
     def test_metadata_shows(self):
+        """PyProven can show metadata and then hide metadata."""
         self.pdb.show_metadata()
         self.assertTrue('_provendb_metadata' in self.pdb['unit-test'].find_one())
         self.pdb.hide_metadata()
