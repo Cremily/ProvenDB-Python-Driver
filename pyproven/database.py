@@ -34,7 +34,7 @@ from pyproven.exceptions import (
     ListVersionException,
     PrepareForgetException,
     RollbackException,
-    SetVersionException,
+    SetVersionException, SubmitProofException,
 )
 from pyproven.versions import (
     GetVersionResponse,
@@ -531,7 +531,9 @@ class ProvenDB:
         anchor_type: Optional[str] = None,
         n_checks: Optional[int] = None,
     ) -> SubmitProofResponse:
-        command_args: SON = SON({"verifyProof":version})
+        #Must use SON as the command name is part of the document, not {command_name: {commands}}.
+        # This means the order of keys matters, and Python dicts are not ordered. 
+        command_args: SON = SON({"submitProof":version})
         if collections:
             command_args.update({"collections":collections})
         if filter:
@@ -542,4 +544,6 @@ class ProvenDB:
             command_args.update({"nChecks": n_checks})
         try:
             response = self.db.command(command_args)
-            return 
+            return SubmitProofResponse(response)
+        except PyMongoError as err:
+            raise SubmitProofException(f"Failed to submit proof with arguments {command_args} on {self.db.name} ",err)

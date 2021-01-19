@@ -55,7 +55,11 @@ class VersionProof(UserDict):
 class SubmitProofResponse(ProvenResponse):
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
-        raise NotImplementedError()
+        self.version = document['version']
+        self.dateTime = document['dateTime']
+        self.hash = document['hash']
+        self.proofId = document['proofId']
+        self.status = document['status']
 
 
 def _process_document_proof(document: Dict[str, Any]) -> DocumentProof:
