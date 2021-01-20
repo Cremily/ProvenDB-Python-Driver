@@ -1,5 +1,4 @@
-import datetime
-from pyproven.storage import ListStorageDocuments, ListStorageResponse
+from pyproven.storage import ListStorageResponse
 from typing import List
 
 import unittest
@@ -10,6 +9,8 @@ from pymongo import MongoClient
 
 from pyproven.exceptions import BulkLoadException, SetVersionException
 from pyproven import ProvenDB
+
+import time
 
 PROVENDB_URI = os.getenv("PROVENDB_URI")
 PROVENDB_DATABASE = os.getenv("PROVENDB_DB")
@@ -25,7 +26,7 @@ class ProvenDBTests(unittest.TestCase):
         """PyProven can create a ProvenDB object."""
         self.assertIsInstance(self.pdb, ProvenDB)
 
-    def test_bulk_load(self):
+    def test_bulk_load_start_stop(self):
         """PyProven can start and then stop a bulkload operation, and check the current bulkload status."""
         try:
             self.pdb.bulk_load_start()
@@ -40,7 +41,6 @@ class ProvenDBTests(unittest.TestCase):
             except BulkLoadException:
                 pass
             raise err
-
     def test_get_version(self):
         """PyProven can get the version the DB is set to."""
         version = self.pdb.get_version()
@@ -103,5 +103,18 @@ class ProvenDBTests(unittest.TestCase):
         self.pdb.hide_metadata()
         self.assertTrue('provendb_metadata' not in self.pdb['unit-test'].find_one())
 
+    def test_submit_proof(self):
+        "pyproven can correctly submit proofs."
+        self.pdb.set_version('current')
+        current_version = self.pdb.get_version().version
+        submit_response = self.pdb.submit_proof(current_version,collections=['unit-test'],filter={"submit_proof":True})
+        self.assertTrue(submit_response.version == current_version)
+    
+    def test_verify_proof(self):
+        for document in self.pdb.db['_provendb_versionProofs'].find({'status':'valid'}).limit(1):
+            proof = self.pdb.verify_proof(document['proofId'])
+            self.assertTrue(proof.proofId == document['proofId'])
+
+        
 if __name__ == "__main__":
     unittest.main()
