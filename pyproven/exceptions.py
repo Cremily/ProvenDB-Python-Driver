@@ -101,3 +101,6 @@ class RollbackException(PyProvenException):
 
 class ListStorageException(PyProvenException):
     """Exception raised when :class:`pyproven.database.ProvenDB`fails to get the list of storage sizes for each collection in the db. """
+
+class SubmitProofException(PyProvenException):
+    """Exception raised when :class:`pyproven.database.ProvenDB` fails at submitting a proof. """

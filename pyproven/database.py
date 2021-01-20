@@ -7,12 +7,12 @@ from pyproven.storage import ListStorageResponse
 from bson.son import SON
 from pyproven.proofs import (
     GetDocumentProofResponse,
-    GetVersionProofResponse,
+    GetVersionProofResponse, SubmitProofResponse,
     _process_document_proof,
 )
 
 
-from typing import Any, Optional, TypeVar, Union, Dict
+from typing import Any, List, Optional, TypeVar, Union, Dict
 
 from pymongo.database import Database as PymongoDatabase
 from pymongo.errors import PyMongoError
@@ -522,3 +522,24 @@ class ProvenDB:
             return HideMetadataResponse(response)
         except PyMongoError as err:
             print(f"Failed to hide metatdata on db {self.db.name}", err)
+            
+    def submit_proof(
+        self,
+        version: int,
+        collections: Optional[List[str]] = None,
+        filter: Optional[Dict[str, Any]] = None,
+        anchor_type: Optional[str] = None,
+        n_checks: Optional[int] = None,
+    ) -> SubmitProofResponse:
+        command_args: SON = SON({"verifyProof":version})
+        if collections:
+            command_args.update({"collections":collections})
+        if filter:
+            command_args.update({"filter":filter})
+        if anchor_type:
+            command_args.update({"anchorType":anchor_type})
+        if n_checks:
+            command_args.update({"nChecks": n_checks})
+        try:
+            response = self.db.command(command_args)
+            return 
