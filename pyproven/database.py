@@ -7,7 +7,9 @@ from pyproven.storage import ListStorageResponse
 from bson.son import SON
 from pyproven.proofs import (
     GetDocumentProofResponse,
-    GetVersionProofResponse, SubmitProofResponse,
+    GetVersionProofResponse,
+    SubmitProofResponse,
+    VerifyProofResponse,
     _process_document_proof,
 )
 
@@ -35,6 +37,8 @@ from pyproven.exceptions import (
     PrepareForgetException,
     RollbackException,
     SetVersionException,
+    SubmitProofException,
+    VerifyProofException,
 )
 from pyproven.versions import (
     GetVersionResponse,
@@ -531,15 +535,36 @@ class ProvenDB:
         anchor_type: Optional[str] = None,
         n_checks: Optional[int] = None,
     ) -> SubmitProofResponse:
-        command_args: SON = SON({"verifyProof":version})
+        # Must use SON as the command name is part of the document, not {command_name: {commands}}.
+        # This means the order of keys matters, and Python dicts are not ordered.
+        command_args: SON = SON({"submitProof": version})
         if collections:
-            command_args.update({"collections":collections})
+            command_args.update({"collections": collections})
         if filter:
-            command_args.update({"filter":filter})
+            command_args.update({"filter": filter})
         if anchor_type:
-            command_args.update({"anchorType":anchor_type})
+            command_args.update({"anchorType": anchor_type})
         if n_checks:
             command_args.update({"nChecks": n_checks})
         try:
             response = self.db.command(command_args)
-            return 
+            return SubmitProofResponse(response)
+        except PyMongoError as err:
+            raise SubmitProofException(
+                f"Failed to submit proof with arguments {command_args} on {self.db.name} ",
+                err,
+            )
+
+    def verify_proof(
+        self, proofId: str, format: Optional[str] = None
+    ) -> VerifyProofResponse:
+        command_args: SON = SON({"verifyProof": proofId})
+        if format:
+            command_args.update({"format": format})
+        try:
+            response = self.db.command(command_args)
+            return VerifyProofResponse(response)
+        except PyMongoError as err:
+            raise VerifyProofException(
+                f"Failed to verify proof {proofId} on {self.db.name}", err
+            )

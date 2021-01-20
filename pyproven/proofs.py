@@ -1,4 +1,5 @@
 from collections import UserDict
+import datetime
 from typing import Any, Dict, List, Optional, Union
 
 from bson.objectid import ObjectId
@@ -41,6 +42,13 @@ class SuccessfulDocumentProof(DocumentProof):
         self.proof: Union[BSON, Dict[str, Any]] = self["proof"]
 
 
+def _process_document_proof(document: Dict[str, Any]) -> DocumentProof:
+    if "errmsg" in document.keys():
+        return FailedDocumentProof(document)
+    else:
+        return SuccessfulDocumentProof(document)
+
+
 class GetVersionProofResponse(ProvenResponse):
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
@@ -52,14 +60,22 @@ class VersionProof(UserDict):
         self._id: ObjectId = self["_id"]
         self.proofId: str = self["proofId"]
 
+
 class SubmitProofResponse(ProvenResponse):
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
-        raise NotImplementedError()
+        self.version: int = document["version"]
+        self.dateTime: datetime.datetime = document["dateTime"]
+        self.hash: str = document["hash"]
+        self.proofId: str = document["proofId"]
+        self.status: str = document["status"]
 
 
-def _process_document_proof(document: Dict[str, Any]) -> DocumentProof:
-    if "errmsg" in document.keys():
-        return FailedDocumentProof(document)
-    else:
-        return SuccessfulDocumentProof(document)
+class VerifyProofResponse(ProvenResponse):
+    def __init__(self, document: Dict[str, Any]):
+        super().__init__(document)
+        # proof json documents are highly dependent on the underlying proof type and collection and thus can't be statically defined.
+        self.proof: Union[Dict[str, Any], bytes] = self["proof"]
+        self.proofId: str = self["proofId"]
+        self.proofStatus: str = self["proofStatus"]
+        self.version: int = self["version"]
