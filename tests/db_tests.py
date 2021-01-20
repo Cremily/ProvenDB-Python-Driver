@@ -11,11 +11,15 @@ from pyproven.exceptions import BulkLoadException, SetVersionException
 from pyproven import ProvenDB
 
 import time
-
-PROVENDB_URI = os.getenv("PROVENDB_URI")
-PROVENDB_DATABASE = os.getenv("PROVENDB_DB")
-if PROVENDB_URI is None or PROVENDB_DATABASE is None:
-    raise EnvironmentError()
+if os.getenv("PROVENDB_URI"):
+    PROVENDB_URI = os.getenv("PROVENDB_URI")
+    PROVENDB_DATABASE = os.getenv("PROVENDB_DB")
+else:
+    PROVENDB_URI = os.getenv("INPUT_PROVENDB_URI")
+    PROVENDB_DATABASE = os.getenv("INPUT_PROVENDB_DB")
+if not (PROVENDB_URI and PROVENDB_DATABASE):
+    print(os.environ)
+    raise EnvironmentError("Could not complete tests since required ProvenDB credentials were not in the environment.")
 
 class ProvenDBTests(unittest.TestCase):
     def setUp(self) -> None:
