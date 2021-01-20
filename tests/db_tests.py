@@ -14,7 +14,8 @@ import time
 
 PROVENDB_URI = os.getenv("PROVENDB_URI")
 PROVENDB_DATABASE = os.getenv("PROVENDB_DB")
-
+if PROVENDB_URI is None or PROVENDB_DATABASE is None:
+    raise EnvironmentError()
 
 class ProvenDBTests(unittest.TestCase):
     def setUp(self) -> None:

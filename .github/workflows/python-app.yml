@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      env:
+    env:
         PROVENDB_URI: ${{secrets.PROVENDB_URI}}
         PROVENDB_DB: ${{secrets.PROVENDB_DB}}
     - uses: actions/checkout@v2
