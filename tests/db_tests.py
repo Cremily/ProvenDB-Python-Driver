@@ -12,8 +12,11 @@ from pyproven import ProvenDB
 
 import time
 
-PROVENDB_URI = os.getenv("PROVENDB_URI")
-PROVENDB_DATABASE = os.getenv("PROVENDB_DB")
+if not (PROVENDB_URI := os.getenv("PROVENDB_URI")):
+    PROVENDB_URI = input()
+
+if not (PROVENDB_DATABASE := os.getenv("PROVENDB_DB")):
+    PROVENDB_DATABASE = input()
 
 
 class ProvenDBTests(unittest.TestCase):

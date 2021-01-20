@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      env:
+        PROVENDB_URI: ${{secrets.PROVENDB_URI}}
+        PROVENDB_DB: ${{secrets.PROVENDB_DB}}
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
@@ -33,4 +36,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with unittest
       run: |
-        python -m unittest tests.db_tests
+        python -m unittest tests.db_tests 
