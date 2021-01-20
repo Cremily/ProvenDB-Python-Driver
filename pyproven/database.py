@@ -522,7 +522,7 @@ class ProvenDB:
             return HideMetadataResponse(response)
         except PyMongoError as err:
             print(f"Failed to hide metatdata on db {self.db.name}", err)
-
+            
     def submit_proof(
         self,
         version: int,
