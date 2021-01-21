@@ -67,7 +67,7 @@ from bson import BSON
 def _fix_op_msg(
     flags, command, dbname, read_preference, slave_ok, check_keys, opts, ctx=None
 ):
-    """Get a OP_MSG message."""
+    """Temporary hack to overwrite the _op_msg function in pymongo to work around a current bug with ProvenDB. This has been reported to the developers and should be fixed soon."""
     import pymongo.message
 
     command["$db"] = dbname
@@ -356,7 +356,7 @@ class ProvenDB:
         proof_format: Optional[str] = None,
     ) -> GetDocumentProofResponse:
         """Filters documents in a collection and returns any proofs of those documents for a given version.
-
+        See: https://provendb.readme.io/docs/getdocumentproof
         :param collection: The name of the collection to filter.
         :type collection: str
         :param filter: A mongodb filter that subsets the collection.
@@ -386,7 +386,8 @@ class ProvenDB:
             ) from None
 
     def get_version(self) -> GetVersionResponse:
-        """Gets the version the db is set to. See https://provendb.readme.io/docs/getversion
+        """Gets the version the db is set to. 
+        See https://provendb.readme.io/docs/getversion
 
         :return: A dict-like object representing the ProvenDB return document.
         :raises GetVersionException: pyproven exception when db fails to return the current version.
@@ -407,6 +408,7 @@ class ProvenDB:
         list_collections: Optional[bool] = None,
     ) -> GetVersionProofResponse:
         """Gets a proof for a specific database version.
+        See https://provendb.readme.io/docs/getproof
 
         :param proof_id: Either a string matching a proofId, or a version number.
         :type proof_id: Union[str, int]
@@ -434,6 +436,7 @@ class ProvenDB:
 
     def list_storage(self) -> ListStorageResponse:
         """Fetches the storage size for each collection in the db.
+        See https://provendb.readme.io/docs/liststorage
 
         :return: A dict-like object holding a list of dict-like objects,
         each containg a single 'collection_name: collection_storage_size' key-value pair.
@@ -455,6 +458,8 @@ class ProvenDB:
         sort_direction: Optional[int] = None,
     ) -> ListVersionsResponse:
         """Retrieves a list of versions given a search parameter.
+        See https://provendb.readme.io/docs/listversions
+
         :param start_date: Specifies first date to retrieve versions, defaults to 24 hours from now
         :type start_date: Optional[datetime.datetime]
         :param end_date: Last date to retrieve documents, defaults to now
@@ -487,6 +492,7 @@ class ProvenDB:
 
     def rollback(self) -> RollbackResponse:
         """Rolls back the database to the last valid version, cancelling any current insert, update or delete operations.
+        See https://provendb.readme.io/docs/rollback
 
         :return: A dict-like object holding the 'db_name: db_version' pair the db has been rolled back to.
         :rtype: RollbackResponse
@@ -501,6 +507,7 @@ class ProvenDB:
         self, date: Union[str, int, datetime.datetime]
     ) -> SetVersionResponse:
         """Sets the database version to a given version identifier.
+        See https://provendb.readme.io/docs/setversion
 
         :param date: Version number, string literal 'current', or :class:`datetime.datetime` object.
         :type date: Union[str,int,datetime]
@@ -519,6 +526,12 @@ class ProvenDB:
             ) from None
 
     def show_metadata(self) -> ShowMetadataResponse:
+        """Causes the db to also show ProvenDB metadata on documents. 
+        See https://provendb.readme.io/docs/showmetadata
+
+        :return: A dict-like object holding the 'ok' response from the database.
+        :rtype: ShowMetadataResponse
+        """
         try:
             response = self.db.command("showMetadata", True)
             return ShowMetadataResponse(response)
@@ -526,6 +539,12 @@ class ProvenDB:
             raise ShowMetadataException(f"Failed to show metatdata on db {self.db.name}", err)
 
     def hide_metadata(self) -> HideMetadataResponse:
+        """Causes the db to hide ProvenDB metadata on documents. 
+        See https://provendb.readme.io/docs/showmetadata
+
+        :return: A dict-like object holding the 'ok' response from the database.
+        :rtype: HideMetadataResponse
+        """
         try:
             response = self.db.command("showMetadata", False)
             return HideMetadataResponse(response)
@@ -540,6 +559,22 @@ class ProvenDB:
         anchor_type: Optional[str] = None,
         n_checks: Optional[int] = None,
     ) -> SubmitProofResponse:
+        """Creates a proof for a version and inserts it on the blockchain. 
+        See https://provendb.readme.io/docs/submitproof
+
+        :param version: The version number to be proved.
+        :type version: int
+        :param collections: The collections to be included, defaults to all. 
+        :type collections: Optional[List[str]], 
+        :param filter: A MongoDB filter that selects documents within the collections, defaults to all documents.
+        :type filter: Optional[Dict[str, Any]], optional
+        :param anchor_type: The blockchain used to anchor the proof, defaults to ETH_MAINNET. 
+        :type anchor_type: Optional[str], optional
+        :param n_checks: Number of times the proof hash will be recalculated
+        :type n_checks: Optional[int], optional
+        :return: A dict-like object holding the proof data. 
+        :rtype: SubmitProofResponse
+        """
         # Must use SON as the command name is part of the document, not {command_name: {commands}}.
         # This means the order of keys matters, and Python dicts are not ordered.
         command_args: SON = SON({"submitProof": version})
@@ -561,9 +596,19 @@ class ProvenDB:
             )
 
     def verify_proof(
-        self, proofId: str, format: Optional[str] = None
+        self, proof_id: str, format: Optional[str] = None
     ) -> VerifyProofResponse:
-        command_args: SON = SON({"verifyProof": proofId})
+        """Verifies a proof previously uploaded to the blockchain. 
+        See https://provendb.readme.io/docs/verifyproof
+
+        :param proof_id: The id of the proof to validate.
+        :type proof_id: str
+        :param format: Format of the proof document, defaults to json
+        :type format: Optional[str]
+        :return: A dict-like object holding the proof and proof information. 
+        :rtype: VerifyProofResponse
+        """
+        command_args: SON = SON({"verifyProof": proof_id})
         if format:
             command_args.update({"format": format})
         try:
@@ -571,5 +616,5 @@ class ProvenDB:
             return VerifyProofResponse(response)
         except PyMongoError as err:
             raise VerifyProofException(
-                f"Failed to verify proof {proofId} on {self.db.name}", err
+                f"Failed to verify proof {proof_id} on {self.db.name}", err
             )
