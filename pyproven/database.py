@@ -449,11 +449,10 @@ class ProvenDB:
 
     def list_versions(
         self,
-        start_date: datetime.datetime = datetime.datetime.today()
-        - datetime.timedelta(days=1),
-        end_date: datetime.datetime = datetime.datetime.today(),
-        limit: int = 10,
-        sort_direction: int = -1,
+        start_date: Optional[datetime.datetime] = None,
+        end_date: Optional[datetime.datetime] = None,
+        limit: Optional[int] = None,
+        sort_direction: Optional[int] = None,
     ) -> ListVersionsResponse:
         """Retrieves a list of versions given a search parameter.
         :param start_date: Specifies first date to retrieve versions, defaults to 24 hours from now
@@ -468,12 +467,15 @@ class ProvenDB:
         :return: A dict-like object representing the ProvenDB response document.
         :rtype: ListVersionsResponse
         """
-        command_args: Dict[str, Union[datetime.datetime, int]] = {
-            "startDate": start_date,
-            "endDate": end_date,
-            "limit": limit,
-            "sortDirection": sort_direction,
-        }
+        command_args: Dict[str, Any] = {}
+        if start_date:
+            command_args.update({"startDate": start_date})
+        if end_date:
+            command_args.update({ "endDate": end_date})
+        if limit:
+            command_args.update({"limit": limit})
+        if sort_direction:
+            command_args.update({"sortDirection": sort_direction})
         try:
             document: Dict[str, Any] = self.db.command({"listVersions": command_args})
             return ListVersionsResponse(document)
