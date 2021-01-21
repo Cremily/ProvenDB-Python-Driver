@@ -287,7 +287,7 @@ class ProvenDB:
         filter: Dict[str, Any],
         min_version: Optional[int] = None,
         max_version: Optional[int] = None,
-        inclusive_range: bool = True,
+        inclusive_range: Optional[bool] = None,
     ) -> PrepareForgetResponse:
         """Prepares an operation to forget a set of documents. This will erase the data but preserve hashes so as to verify proofs.
         See https://provendb.readme.io/docs/forget
@@ -306,16 +306,16 @@ class ProvenDB:
         :return: A dict-like object that holds the forget password as well as forget summary.
         :rtype: PrepareForgetResponse
         """
-        # get_version can't be called as a default param, so must be done within func.
-        if not max_version:
-            max_version = self.get_version()
         command_args: Dict[str, Any] = {
             "collection": collection,
             "filter": filter,
-            "minVersion": min_version,
-            "maxVersion": max_version,
-            "inclusiveRange": inclusive_range,
         }
+        if min_version:
+            command_args.update({"minVersion":min_version})
+        if max_version:
+            command_args.update({"maxVersion": max_version})
+        if inclusive_range:
+            command_args.update({"inclusiveRange":inclusive_range})
         try:
             response = self.db.command("forget", {"prepare": command_args})
             return PrepareForgetResponse(response)
