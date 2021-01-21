@@ -39,7 +39,7 @@ class CreateIgnoredResponse(ProvenResponse):
         def __init__(self, document: Dict[str, Any]):
             super().__init__(document)
             self.clusterTime = document["clusterTime"]
-            self.signature = self.Signature(document["signature"])
+            self.signature = CreateIgnoredResponse.Signature(document["signature"])
 
     class Signature(UserDict):
         def __init__(self, document: Dict[str, Any]):

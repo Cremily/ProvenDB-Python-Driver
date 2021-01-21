@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 import pymongo
 
 from pymongo.errors import PyMongoError
@@ -9,21 +9,15 @@ class PyProvenException(Exception):
 
     def __init__(
         self,
-        message: str = None,
-        pymongo_exception: PyMongoError = None,
-        proven_error: Dict[str, Any] = None,
+        message: str = "",
+        pymongo_exception: Optional[PyMongoError] = None,
     ):
         self.message = message
         self.mongo_excep = pymongo_exception
-        self.proven_error = proven_error
         self.explain = self.message + "\n"
         if self.mongo_excep:
             self.explain += (
                 f"pymongo also raised an exception: {str(self.mongo_excep)}. \n"
-            )
-        if self.proven_error:
-            self.explain += (
-                f"The ProvenDB instance also raised an error {str(proven_error)}."
             )
         super().__init__(self.explain)
 
@@ -109,3 +103,9 @@ class SubmitProofException(PyProvenException):
 
 class VerifyProofException(PyProvenException):
     """Exception raised when :class:`pyproven.database.ProvenDB` fails at varifying a proof. """
+
+class ShowMetadataException(PyProvenException):
+    """Exception raised when :class:`pyproven.database.ProvenDB` fails at displaying metadata."""
+
+class HideMetadataException(PyProvenException):
+    """Exception raised when :class:`pyproven.database.ProvenDB` fails at hiding metadata."""
