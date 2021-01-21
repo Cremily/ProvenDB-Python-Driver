@@ -31,12 +31,12 @@ from pyproven.exceptions import (
     DocumentHistoryException,
     GetDocumentProofException,
     GetVersionException,
-    GetVersionProofException,
+    GetVersionProofException, HideMetadataException,
     ListStorageException,
     ListVersionException,
     PrepareForgetException,
     RollbackException,
-    SetVersionException,
+    SetVersionException, ShowMetadataException,
     SubmitProofException,
     VerifyProofException,
 )
@@ -523,14 +523,14 @@ class ProvenDB:
             response = self.db.command("showMetadata", True)
             return ShowMetadataResponse(response)
         except PyMongoError as err:
-            print(f"Failed to show metatdata on db {self.db.name}", err)
+            raise ShowMetadataException(f"Failed to show metatdata on db {self.db.name}", err)
 
     def hide_metadata(self) -> HideMetadataResponse:
         try:
             response = self.db.command("showMetadata", False)
             return HideMetadataResponse(response)
         except PyMongoError as err:
-            print(f"Failed to hide metatdata on db {self.db.name}", err)
+            raise HideMetadataException(f"Failed to hide metatdata on db {self.db.name}", err)
 
     def submit_proof(
         self,

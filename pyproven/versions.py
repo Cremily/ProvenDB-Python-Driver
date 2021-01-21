@@ -17,7 +17,7 @@ class ListVersionDocument(UserDict):
     """A dict-like object holding the individual version data. Data can be accessed via dict methods
     or by attribute."""
 
-    def __init__(self, document: Dict[str, any]):
+    def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self.version: float = document["version"]
         self.status: str = document["status"]
