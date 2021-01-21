@@ -471,7 +471,7 @@ class ProvenDB:
         if start_date:
             command_args.update({"startDate": start_date})
         if end_date:
-            command_args.update({"endDate": end_date})
+            command_args.update({ "endDate": end_date})
         if limit:
             command_args.update({"limit": limit})
         if sort_direction:
