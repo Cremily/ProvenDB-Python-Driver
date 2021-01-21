@@ -403,15 +403,15 @@ class ProvenDB:
     def get_version_proof(
         self,
         proof_id: Union[str, int],
-        proof_format: str = "binary",
-        list_collections: bool = False,
+        proof_format: Optional[str] = None,
+        list_collections: Optional[bool] = None
     ) -> GetVersionProofResponse:
         """Gets a proof for a specific database version.
 
         :param proof_id: Either a string matching a proofId, or a version number.
         :type proof_id: Union[str, int]
-        :param proof_format: Format type of proof, either 'binary' or 'json', defaults to "binary"
-        :type proof_format: str
+        :param proof_format: Format type of proof, either 'binary' or 'json', defaults to json
+        :type proof_format: str, optional
         :param list_collections: If True all collections in proof are listed, defaults to False.
         :type list_collections: bool, optional
         :raises GetVersionProofException:
@@ -419,8 +419,10 @@ class ProvenDB:
         :rtype: GetVersionProofResponse
         """
         command_args: SON = SON({"getProof": proof_id})
-        command_args.update({"format": proof_format})
-        command_args.update({"listCollections": list_collections})
+        if proof_format:   
+            command_args.update({"format": proof_format})
+        if list_collections:
+            command_args.update({"listCollections": list_collections})
         try:
             document = self.db.command(command_args)
             return GetVersionProofResponse(document)
