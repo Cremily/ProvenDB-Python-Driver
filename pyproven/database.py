@@ -287,7 +287,7 @@ class ProvenDB:
         filter: Dict[str, Any],
         min_version: Optional[int] = None,
         max_version: Optional[int] = None,
-        inclusive_range: bool = True,
+        inclusive_range: Optional[bool] = None,
     ) -> PrepareForgetResponse:
         """Prepares an operation to forget a set of documents. This will erase the data but preserve hashes so as to verify proofs.
         See https://provendb.readme.io/docs/forget
@@ -300,22 +300,22 @@ class ProvenDB:
         :type min_version: Optional[int], optional
         :param max_version: Maximum verstion to forget documents to. Defaults to current version of database.
         :type max_version: Optional[int], optional
-        :param inclusive_range: If true, only forget documents that ONLY exist between the two versions, defaults to True
+        :param inclusive_range: If true, forget documents that ONLY exist between the two versions, defaults to True
         :type inclusive_range: bool, optional
         :raises PrepareForgetException: Generic error when failing to prepare forget operation on database.
         :return: A dict-like object that holds the forget password as well as forget summary.
         :rtype: PrepareForgetResponse
         """
-        # get_version can't be called as a default param, so must be done within func.
-        if not max_version:
-            max_version = self.get_version()
         command_args: Dict[str, Any] = {
             "collection": collection,
             "filter": filter,
-            "minVersion": min_version,
-            "maxVersion": max_version,
-            "inclusiveRange": inclusive_range,
         }
+        if min_version:
+            command_args.update({"minVersion": min_version})
+        if max_version:
+            command_args.update({"maxVersion": max_version})
+        if inclusive_range:
+            command_args.update({"inclusiveRange": inclusive_range})
         try:
             response = self.db.command("forget", {"prepare": command_args})
             return PrepareForgetResponse(response)
@@ -353,7 +353,7 @@ class ProvenDB:
         collection: str,
         filter: Dict[str, Any],
         version: int,
-        proof_format: str = "json",
+        proof_format: Optional[str] = None,
     ) -> GetDocumentProofResponse:
         """Filters documents in a collection and returns any proofs of those documents for a given version.
 
@@ -373,8 +373,9 @@ class ProvenDB:
             "collection": collection,
             "filter": filter,
             "version": version,
-            "format": proof_format,
         }
+        if proof_format:
+            command_args.update({"proofFormat": proof_format})
         try:
             response = self.db.command("getDocumentProof", command_args)
             return GetDocumentProofResponse(response)
@@ -402,15 +403,15 @@ class ProvenDB:
     def get_version_proof(
         self,
         proof_id: Union[str, int],
-        proof_format: str = "binary",
-        list_collections: bool = False,
+        proof_format: Optional[str] = None,
+        list_collections: Optional[bool] = None,
     ) -> GetVersionProofResponse:
         """Gets a proof for a specific database version.
 
         :param proof_id: Either a string matching a proofId, or a version number.
         :type proof_id: Union[str, int]
-        :param proof_format: Format type of proof, either 'binary' or 'json', defaults to "binary"
-        :type proof_format: str
+        :param proof_format: Format type of proof, either 'binary' or 'json', defaults to json
+        :type proof_format: str, optional
         :param list_collections: If True all collections in proof are listed, defaults to False.
         :type list_collections: bool, optional
         :raises GetVersionProofException:
@@ -418,8 +419,10 @@ class ProvenDB:
         :rtype: GetVersionProofResponse
         """
         command_args: SON = SON({"getProof": proof_id})
-        command_args.update({"format": proof_format})
-        command_args.update({"listCollections": list_collections})
+        if proof_format:
+            command_args.update({"format": proof_format})
+        if list_collections:
+            command_args.update({"listCollections": list_collections})
         try:
             document = self.db.command(command_args)
             return GetVersionProofResponse(document)
@@ -446,11 +449,10 @@ class ProvenDB:
 
     def list_versions(
         self,
-        start_date: datetime.datetime = datetime.datetime.today()
-        - datetime.timedelta(days=1),
-        end_date: datetime.datetime = datetime.datetime.today(),
-        limit: int = 10,
-        sort_direction: int = -1,
+        start_date: Optional[datetime.datetime] = None,
+        end_date: Optional[datetime.datetime] = None,
+        limit: Optional[int] = None,
+        sort_direction: Optional[int] = None,
     ) -> ListVersionsResponse:
         """Retrieves a list of versions given a search parameter.
         :param start_date: Specifies first date to retrieve versions, defaults to 24 hours from now
@@ -465,12 +467,15 @@ class ProvenDB:
         :return: A dict-like object representing the ProvenDB response document.
         :rtype: ListVersionsResponse
         """
-        command_args: Dict[str, Union[datetime.datetime, int]] = {
-            "startDate": start_date,
-            "endDate": end_date,
-            "limit": limit,
-            "sortDirection": sort_direction,
-        }
+        command_args: Dict[str, Any] = {}
+        if start_date:
+            command_args.update({"startDate": start_date})
+        if end_date:
+            command_args.update({ "endDate": end_date})
+        if limit:
+            command_args.update({"limit": limit})
+        if sort_direction:
+            command_args.update({"sortDirection": sort_direction})
         try:
             document: Dict[str, Any] = self.db.command({"listVersions": command_args})
             return ListVersionsResponse(document)
@@ -526,7 +531,7 @@ class ProvenDB:
             return HideMetadataResponse(response)
         except PyMongoError as err:
             print(f"Failed to hide metatdata on db {self.db.name}", err)
-            
+
     def submit_proof(
         self,
         version: int,
