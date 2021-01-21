@@ -311,11 +311,11 @@ class ProvenDB:
             "filter": filter,
         }
         if min_version:
-            command_args.update({"minVersion":min_version})
+            command_args.update({"minVersion": min_version})
         if max_version:
             command_args.update({"maxVersion": max_version})
         if inclusive_range:
-            command_args.update({"inclusiveRange":inclusive_range})
+            command_args.update({"inclusiveRange": inclusive_range})
         try:
             response = self.db.command("forget", {"prepare": command_args})
             return PrepareForgetResponse(response)
@@ -375,7 +375,7 @@ class ProvenDB:
             "version": version,
         }
         if proof_format:
-            command_args.update({"proofFormat":proof_format})
+            command_args.update({"proofFormat": proof_format})
         try:
             response = self.db.command("getDocumentProof", command_args)
             return GetDocumentProofResponse(response)
@@ -404,7 +404,7 @@ class ProvenDB:
         self,
         proof_id: Union[str, int],
         proof_format: Optional[str] = None,
-        list_collections: Optional[bool] = None
+        list_collections: Optional[bool] = None,
     ) -> GetVersionProofResponse:
         """Gets a proof for a specific database version.
 
@@ -419,7 +419,7 @@ class ProvenDB:
         :rtype: GetVersionProofResponse
         """
         command_args: SON = SON({"getProof": proof_id})
-        if proof_format:   
+        if proof_format:
             command_args.update({"format": proof_format})
         if list_collections:
             command_args.update({"listCollections": list_collections})
@@ -471,7 +471,7 @@ class ProvenDB:
         if start_date:
             command_args.update({"startDate": start_date})
         if end_date:
-            command_args.update({ "endDate": end_date})
+            command_args.update({"endDate": end_date})
         if limit:
             command_args.update({"limit": limit})
         if sort_direction:
@@ -531,7 +531,7 @@ class ProvenDB:
             return HideMetadataResponse(response)
         except PyMongoError as err:
             print(f"Failed to hide metatdata on db {self.db.name}", err)
-            
+
     def submit_proof(
         self,
         version: int,
