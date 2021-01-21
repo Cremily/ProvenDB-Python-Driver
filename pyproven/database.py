@@ -300,7 +300,7 @@ class ProvenDB:
         :type min_version: Optional[int], optional
         :param max_version: Maximum verstion to forget documents to. Defaults to current version of database.
         :type max_version: Optional[int], optional
-        :param inclusive_range: If true, only forget documents that ONLY exist between the two versions, defaults to True
+        :param inclusive_range: If true, forget documents that ONLY exist between the two versions, defaults to True
         :type inclusive_range: bool, optional
         :raises PrepareForgetException: Generic error when failing to prepare forget operation on database.
         :return: A dict-like object that holds the forget password as well as forget summary.
@@ -353,7 +353,7 @@ class ProvenDB:
         collection: str,
         filter: Dict[str, Any],
         version: int,
-        proof_format: str = "json",
+        proof_format: Optional[str] = None,
     ) -> GetDocumentProofResponse:
         """Filters documents in a collection and returns any proofs of those documents for a given version.
 
@@ -373,8 +373,9 @@ class ProvenDB:
             "collection": collection,
             "filter": filter,
             "version": version,
-            "format": proof_format,
         }
+        if proof_format:
+            command_args.update({"proofFormat":proof_format})
         try:
             response = self.db.command("getDocumentProof", command_args)
             return GetDocumentProofResponse(response)
