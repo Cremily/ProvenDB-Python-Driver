@@ -388,7 +388,7 @@ class ProvenDB:
             ) from None
 
     def get_version(self) -> GetVersionResponse:
-        """Gets the version the db is set to. 
+        """Gets the version the db is set to.
         See https://provendb.readme.io/docs/getversion
 
         :return: A dict-like object representing the ProvenDB return document.
@@ -528,7 +528,7 @@ class ProvenDB:
             ) from None
 
     def show_metadata(self) -> ShowMetadataResponse:
-        """Causes the db to also show ProvenDB metadata on documents. 
+        """Causes the db to also show ProvenDB metadata on documents.
         See https://provendb.readme.io/docs/showmetadata
 
         :return: A dict-like object holding the 'ok' response from the database.
@@ -543,7 +543,7 @@ class ProvenDB:
             )
 
     def hide_metadata(self) -> HideMetadataResponse:
-        """Causes the db to hide ProvenDB metadata on documents. 
+        """Causes the db to hide ProvenDB metadata on documents.
         See https://provendb.readme.io/docs/showmetadata
 
         :return: A dict-like object holding the 'ok' response from the database.
@@ -565,20 +565,20 @@ class ProvenDB:
         anchor_type: Optional[str] = None,
         n_checks: Optional[int] = None,
     ) -> SubmitProofResponse:
-        """Creates a proof for a version and inserts it on the blockchain. 
+        """Creates a proof for a version and inserts it on the blockchain.
         See https://provendb.readme.io/docs/submitproof
 
         :param version: The version number to be proved.
         :type version: int
-        :param collections: The collections to be included, defaults to all. 
-        :type collections: Optional[List[str]], 
+        :param collections: The collections to be included, defaults to all.
+        :type collections: Optional[List[str]],
         :param filter: A MongoDB filter that selects documents within the collections, defaults to all documents.
         :type filter: Optional[Dict[str, Any]], optional
-        :param anchor_type: The blockchain used to anchor the proof, defaults to ETH_MAINNET. 
+        :param anchor_type: The blockchain used to anchor the proof, defaults to ETH_MAINNET.
         :type anchor_type: Optional[str], optional
         :param n_checks: Number of times the proof hash will be recalculated
         :type n_checks: Optional[int], optional
-        :return: A dict-like object holding the proof data. 
+        :return: A dict-like object holding the proof data.
         :rtype: SubmitProofResponse
         """
         # Must use SON as the command name is part of the document, not {command_name: {commands}}.
@@ -604,14 +604,14 @@ class ProvenDB:
     def verify_proof(
         self, proof_id: str, format: Optional[str] = None
     ) -> VerifyProofResponse:
-        """Verifies a proof previously uploaded to the blockchain. 
+        """Verifies a proof previously uploaded to the blockchain.
         See https://provendb.readme.io/docs/verifyproof
 
         :param proof_id: The id of the proof to validate.
         :type proof_id: str
         :param format: Format of the proof document, defaults to json
         :type format: Optional[str]
-        :return: A dict-like object holding the proof and proof information. 
+        :return: A dict-like object holding the proof and proof information.
         :rtype: VerifyProofResponse
         """
         command_args: SON = SON({"verifyProof": proof_id})
