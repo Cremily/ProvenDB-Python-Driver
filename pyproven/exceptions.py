@@ -104,8 +104,10 @@ class SubmitProofException(PyProvenException):
 class VerifyProofException(PyProvenException):
     """Exception raised when :class:`pyproven.database.ProvenDB` fails at varifying a proof. """
 
+
 class ShowMetadataException(PyProvenException):
     """Exception raised when :class:`pyproven.database.ProvenDB` fails at displaying metadata."""
+
 
 class HideMetadataException(PyProvenException):
     """Exception raised when :class:`pyproven.database.ProvenDB` fails at hiding metadata."""

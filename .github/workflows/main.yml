@@ -24,9 +24,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest mypy black
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: black autoformat
-      run: |
-        black pyproven
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -36,6 +33,9 @@ jobs:
     - name: Lint with mypy
       run: |
         mypy pyproven
+    - name: Lint with black
+      run: |
+        black pyproven --check
     - name: Test with unittest
       env:
         PROVENDB_URI: ${{secrets.PROVENDB_URI}}
