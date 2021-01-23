@@ -57,6 +57,7 @@ class GetVersionProofResponse(ProvenResponse):
 
 class VersionProof(UserDict):
     def __init__(self, document: Dict[str, Any]):
+        super().__init__(document)
         self._id: ObjectId = self["_id"]
         self.proofId: str = self["proofId"]
 
