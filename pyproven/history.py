@@ -1,6 +1,5 @@
-from collections import UserDict
-from typing import Any, Dict, List
-from pyproven.response import ProvenResponse
+from typing import Any, Dict
+from pyproven.response import ProvenDocument, ProvenResponse
 
 
 class DocumentHistoryResponse(ProvenResponse):
@@ -13,7 +12,7 @@ class DocumentHistoryResponse(ProvenResponse):
         self.collection = self["collection"]
 
 
-class DocumentHistoryItem(UserDict):
+class DocumentHistoryItem(ProvenDocument):
     """A dict like object that represents a specific document in the DB, and contains each version that was searched for."""
 
     def __init__(self, document: Dict[str, Any]):
@@ -25,7 +24,7 @@ class DocumentHistoryItem(UserDict):
         self.versions = self["versions"]
 
 
-class DocumentHistoryVersion(UserDict):
+class DocumentHistoryVersion(ProvenDocument):
     """A dict-like object that represents an individual history of a specific document."""
 
     def __init__(self, document: Dict[str, Any]):

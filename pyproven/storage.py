@@ -1,6 +1,6 @@
 from collections import UserDict
 from typing import Any, Dict
-from pyproven.response import ProvenResponse
+from pyproven.response import ProvenDocument, ProvenResponse
 
 
 class ListStorageResponse(ProvenResponse):
@@ -11,5 +11,5 @@ class ListStorageResponse(ProvenResponse):
         self.storageList = [ListStorageDocuments(i) for i in self["storageList"]]
 
 
-class ListStorageDocuments(UserDict):
+class ListStorageDocuments(ProvenDocument):
     """Dict-like object holding the 'collection: collection_storage_size' key-value pair given by `:class:pyproven.database.ProvenDB.list_storage()"""

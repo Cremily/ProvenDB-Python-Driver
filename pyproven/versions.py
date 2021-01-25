@@ -3,7 +3,7 @@ from collections import UserDict
 from typing import Any, Dict
 
 
-from pyproven.response import ProvenResponse
+from pyproven.response import ProvenDocument, ProvenResponse
 
 
 class CompactResponse(ProvenResponse):
@@ -15,7 +15,7 @@ class CompactResponse(ProvenResponse):
         self.nVersionsDeleted = self["nVersionsDeleted"]
 
 
-class ListVersionDocument(UserDict):
+class ListVersionDocument(ProvenDocument):
     """A dict-like object holding the individual version data retrieved from a list_version command."""
 
     def __init__(self, document: Dict[str, Any]):
@@ -25,7 +25,7 @@ class ListVersionDocument(UserDict):
         self.effective_date: str = document["effectiveDate"]
 
 
-class ListVersionsResponse(UserDict):
+class ListVersionsResponse(ProvenDocument):
     """A dict-like object containing the versions matching the search parameters in a list_version command."""
 
     def __init__(self, document: Dict[str, Any]):
