@@ -15,10 +15,10 @@ if os.getenv("PROVENDB_URI"):
     PROVENDB_URI = os.getenv("PROVENDB_URI")
     PROVENDB_DATABASE = os.getenv("PROVENDB_DB")
 else:
+    #used for github actions that set enviornment variables as such. 
     PROVENDB_URI = os.getenv("INPUT_PROVENDB_URI")
     PROVENDB_DATABASE = os.getenv("INPUT_PROVENDB_DB")
 if not (PROVENDB_URI and PROVENDB_DATABASE):
-    print(os.environ)
     raise EnvironmentError("Could not complete tests since required ProvenDB credentials were not in the environment.")
 
 class ProvenDBTests(unittest.TestCase):
@@ -80,7 +80,7 @@ class ProvenDBTests(unittest.TestCase):
 
     def test_doc_history(self):
         """Pyproven can correctly get the history of documents in a filtered collection"""
-        history = self.pdb.doc_history("unit-test", {"a": 1})
+        history = self.pdb.doc_history("unit-test", {"x": 1})
         self.assertTrue(history.history)
 
     def test_list_storage(self):
