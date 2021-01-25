@@ -1,13 +1,14 @@
-from collections import UserDict, UserList
+from collections import UserDict
 
-from typing import Any, Dict, Optional, Union, List
+from typing import Any, Dict
 
-from datetime import datetime
 
 from pyproven.response import ProvenResponse
 
 
 class CompactResponse(ProvenResponse):
+    """A dict-like object holding the amount of proofs and versions deleted after a compact operation."""
+
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self.nProofsDeleted = self["nProofsDeleted"]
@@ -15,8 +16,7 @@ class CompactResponse(ProvenResponse):
 
 
 class ListVersionDocument(UserDict):
-    """A dict-like object holding the individual version data. Data can be accessed via dict methods
-    or by attribute."""
+    """A dict-like object holding the individual version data retrieved from a list_version command."""
 
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
@@ -26,7 +26,7 @@ class ListVersionDocument(UserDict):
 
 
 class ListVersionsResponse(UserDict):
-    """A dict-like object containing the retrieved version data."""
+    """A dict-like object containing the versions matching the search parameters in a list_version command."""
 
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
@@ -34,6 +34,8 @@ class ListVersionsResponse(UserDict):
 
 
 class VersionResponse(ProvenResponse):
+    """ABC for get_version and set_version response documents."""
+
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self.response: str = document["response"]
@@ -42,9 +44,10 @@ class VersionResponse(ProvenResponse):
 
 
 class GetVersionResponse(VersionResponse):
-    def __init__(self, document: Dict[str, Any]):
-        super().__init__(document)
+    """Dict-like object holding the data for a get_version response.
+    See :class:`VersionResponse`"""
 
 
 class SetVersionResponse(VersionResponse):
-    pass
+    """Dict-like object holding the data for a set_version response.
+    See :class:`VersionResponse`"""
