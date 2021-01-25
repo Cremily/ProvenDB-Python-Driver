@@ -1,9 +1,8 @@
-from collections import UserDict
 import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 from bson.objectid import ObjectId
-from pyproven.response import ProvenResponse
+from pyproven.response import ProvenDocument, ProvenResponse
 from bson import BSON
 
 
@@ -16,7 +15,7 @@ class GetDocumentProofResponse(ProvenResponse):
         self.proofs: List[DocumentProof] = self["proofs"]
 
 
-class DocumentProof(UserDict):
+class DocumentProof(ProvenDocument):
     """ABC for an individual document proof."""
 
     def __init__(self, document: Dict[str, Any]) -> None:
@@ -66,7 +65,7 @@ class GetVersionProofResponse(ProvenResponse):
         self.proofs = [VersionProof(proof) for proof in self["proofs"]]
 
 
-class VersionProof(UserDict):
+class VersionProof(ProvenDocument):
     """Dict-like object representing a specific proof for a version."""
 
     def __init__(self, document: Dict[str, Any]):

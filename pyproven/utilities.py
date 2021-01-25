@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 from collections import UserDict
-from pyproven.response import ProvenResponse
+from pyproven.response import ProvenDocument, ProvenResponse
 
 
 class BulkLoadResponse(ProvenResponse):
@@ -35,13 +35,13 @@ class BulkLoadStatusResponse(BulkLoadResponse):
 class CreateIgnoredResponse(ProvenResponse):
     """ProvenDB response document when setting a collection to be ignored."""
 
-    class ClusterTime(UserDict):
+    class ClusterTime(ProvenDocument):
         def __init__(self, document: Dict[str, Any]):
             super().__init__(document)
             self.clusterTime = document["clusterTime"]
             self.signature = CreateIgnoredResponse.Signature(document["signature"])
 
-    class Signature(UserDict):
+    class Signature(ProvenDocument):
         def __init__(self, document: Dict[str, Any]):
             super().__init__(document)
             self.hash: bytes = self["hash"]
@@ -54,14 +54,14 @@ class CreateIgnoredResponse(ProvenResponse):
         self.operationTime = self["operationTime"]
 
 
-class PrepareForgetSummary(UserDict):
+class PrepareForgetSummary(ProvenDocument):
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self.documentsToBeForgotten: int = self["documentsToBeForgotten"]
         self.uniqueDocuments: int = self["uniqueDocuments"]
 
 
-class ExecuteForgetSummary(UserDict):
+class ExecuteForgetSummary(ProvenDocument):
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self.documentsForgotten: int = self["documentsForgotten"]
@@ -95,7 +95,7 @@ class RollbackResponse(ProvenResponse):
         ]
 
 
-class RollbackVersion(UserDict):
+class RollbackVersion(ProvenDocument):
     """Dict-like object holding the 'db_name: db_version' key-value pair given by `:class:pyproven.database.ProvenDB.rollback()`"""
 
 
