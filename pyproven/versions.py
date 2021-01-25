@@ -10,8 +10,8 @@ from pyproven.response import ProvenResponse
 class CompactResponse(ProvenResponse):
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
-        self.nProofsDeleted = self['nProofsDeleted']
-        self.nVersionsDeleted = self['nVersionsDeleted']
+        self.nProofsDeleted = self["nProofsDeleted"]
+        self.nVersionsDeleted = self["nVersionsDeleted"]
 
 
 class ListVersionDocument(UserDict):
