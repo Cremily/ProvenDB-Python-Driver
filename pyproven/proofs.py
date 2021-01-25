@@ -8,6 +8,8 @@ from bson import BSON
 
 
 class GetDocumentProofResponse(ProvenResponse):
+    """Dict-like object representing the list of proofs retrieved for a given version."""
+
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self["proofs"] = [_process_document_proof(proof) for proof in self["proofs"]]
@@ -15,17 +17,23 @@ class GetDocumentProofResponse(ProvenResponse):
 
 
 class DocumentProof(UserDict):
+    """ABC for an individual document proof."""
+
     def __init__(self, document: Dict[str, Any]) -> None:
         super().__init__(document)
 
 
 class FailedDocumentProof(DocumentProof):
+    """Dict-like object holding the failed proof for a specific document."""
+
     def __init__(self, document: Dict[str, Any]) -> None:
         super().__init__(document)
         self.errmsg = self["errmsg"]
 
 
 class SuccessfulDocumentProof(DocumentProof):
+    """Dict-like object holding details of a valid proof for a specific document. """
+
     def __init__(self, document: Dict[str, Any]) -> None:
         super().__init__(document)
         self.collection: str = self["collection"]
@@ -43,6 +51,7 @@ class SuccessfulDocumentProof(DocumentProof):
 
 
 def _process_document_proof(document: Dict[str, Any]) -> DocumentProof:
+    """Helper factory function to determine if a specific document proof is a failure or not."""
     if "errmsg" in document.keys():
         return FailedDocumentProof(document)
     else:
@@ -50,12 +59,16 @@ def _process_document_proof(document: Dict[str, Any]) -> DocumentProof:
 
 
 class GetVersionProofResponse(ProvenResponse):
+    """Dict-like object holding the list of proofs for a specific version."""
+
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self.proofs = [VersionProof(proof) for proof in self["proofs"]]
 
 
 class VersionProof(UserDict):
+    """Dict-like object representing a specific proof for a version."""
+
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self._id: ObjectId = self["_id"]
@@ -63,6 +76,8 @@ class VersionProof(UserDict):
 
 
 class SubmitProofResponse(ProvenResponse):
+    """Dict-like object holding data for the submitted proof."""
+
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         self.version: int = document["version"]
@@ -73,6 +88,8 @@ class SubmitProofResponse(ProvenResponse):
 
 
 class VerifyProofResponse(ProvenResponse):
+    """Dict-like object containing verification data for a specific proof."""
+
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
         # proof json documents are highly dependent on the underlying proof type and collection and thus can't be statically defined.
