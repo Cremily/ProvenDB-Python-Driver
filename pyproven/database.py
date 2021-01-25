@@ -209,7 +209,7 @@ class ProvenDB:
                 f"Failure to check bulk load status on db {self.db.name}", err
             ) from None
 
-    def compact_versions(self, start_version: int, end_version: int) -> CompactResponse:
+    def compact_versions(self, start_version: int, end_version: int, destroy_proofs: Optional[bool] = None) -> CompactResponse:
         """Compacts all proofs, versions and documents in the db between two given versions,
         deleting all data that only exists between the two versions.
         See https://provendb.readme.io/docs/compact
@@ -223,6 +223,8 @@ class ProvenDB:
         :rtype: CompactResponse
         """
         command_args = {"startVersion": start_version, "endVersion": end_version}
+        if destroy_proofs:
+            command_args.update({"destroyProofs":destroy_proofs})
         try:
             response = self.db.command("compact", command_args)
             return CompactResponse(response)
