@@ -21,26 +21,26 @@ from pymongo.errors import PyMongoError
 
 from pyproven.history import DocumentHistoryResponse
 from pyproven.exceptions import (
-    BulkLoadAlreadyStartedException,
-    BulkLoadException,
-    BulkLoadNotStartedException,
-    BulkLoadStartException,
-    BulkLoadStopException,
-    CompactException,
-    CreateIgnoredException,
-    DocumentHistoryException,
-    GetDocumentProofException,
-    GetVersionException,
-    GetVersionProofException,
-    HideMetadataException,
-    ListStorageException,
-    ListVersionException,
-    PrepareForgetException,
-    RollbackException,
-    SetVersionException,
-    ShowMetadataException,
-    SubmitProofException,
-    VerifyProofException,
+    BulkLoadAlreadyStartedError,
+    BulkLoadError,
+    BulkLoadNotStartedError,
+    BulkLoadStartError,
+    BulkLoadStopError,
+    CompactError,
+    CreateIgnoredError,
+    DocumentHistoryError,
+    GetDocumentProofError,
+    GetVersionError,
+    GetVersionProofError,
+    HideMetadataError,
+    ListStorageError,
+    ListVersionError,
+    PrepareForgetError,
+    RollbackError,
+    SetVersionError,
+    ShowMetadataError,
+    SubmitProofError,
+    VerifyProofError,
 )
 from pyproven.versions import (
     GetVersionResponse,
@@ -132,7 +132,7 @@ class ProvenDB:
         :rtype: BulkLoadStartResponse
         """
         if self.bulk_load_status().status == "on":
-            raise BulkLoadAlreadyStartedException(
+            raise BulkLoadAlreadyStartedError(
                 f"Attemped to start bulk load on db {self.db.name}, but the db is already bulk loading."
             )
         try:
@@ -141,7 +141,7 @@ class ProvenDB:
             )
             return BulkLoadStartResponse(document)
         except PyMongoError as err:
-            raise BulkLoadStartException(
+            raise BulkLoadStartError(
                 f"Failure to start bulk load on db {self.db.name}", err
             ) from None
 
@@ -155,7 +155,7 @@ class ProvenDB:
         :rtype: BulkLoadStopResponse
         """
         if self.bulk_load_status().status == "off":
-            raise BulkLoadNotStartedException(
+            raise BulkLoadNotStartedError(
                 "Attempted to stop a bulk load on db {self.db.name}, but the db isn't currently bulk loading."
             )
         try:
@@ -164,7 +164,7 @@ class ProvenDB:
             )
             return BulkLoadStopResponse(document)
         except PyMongoError as err:
-            raise BulkLoadException(
+            raise BulkLoadError(
                 f"Failure to stop bulk load on db {self.db.name}", err
             ) from None
 
@@ -178,7 +178,7 @@ class ProvenDB:
         :rtype: BulkLoadKillResponse
         """
         if self.bulk_load_status().status == "off":
-            raise BulkLoadNotStartedException(
+            raise BulkLoadNotStartedError(
                 "Attempted to kill a bulk load on db {self.db.name}, but the db isn't currently bulk loading."
             )
         try:
@@ -187,7 +187,7 @@ class ProvenDB:
             )
             return BulkLoadKillResponse(document)
         except PyMongoError as err:
-            raise BulkLoadException(
+            raise BulkLoadError(
                 f"Failure to start bulk load on db {self.db.name}", err
             ) from None
 
@@ -205,7 +205,7 @@ class ProvenDB:
             )
             return BulkLoadStatusResponse(document)
         except PyMongoError as err:
-            raise BulkLoadException(
+            raise BulkLoadError(
                 f"Failure to check bulk load status on db {self.db.name}", err
             ) from None
 
@@ -234,7 +234,7 @@ class ProvenDB:
             response = self.db.command("compact", command_args)
             return CompactResponse(response)
         except PyMongoError as err:
-            raise CompactException(
+            raise CompactError(
                 f"Failed to compact on {self.db.name} between versions {start_version} and {end_version}.",
                 err,
             ) from None
@@ -254,7 +254,7 @@ class ProvenDB:
             response = self.db.command("createIgnored", collection)
             return CreateIgnoredResponse(response)
         except PyMongoError as err:
-            raise CreateIgnoredException(
+            raise CreateIgnoredError(
                 f"Failed to set collection {collection} on db {self.db.name} to be ignored.",
                 err,
             ) from None
@@ -284,7 +284,7 @@ class ProvenDB:
             document = self.db.command("docHistory", command_args)
             return DocumentHistoryResponse(document)
         except PyMongoError as err:
-            raise DocumentHistoryException(
+            raise DocumentHistoryError(
                 f"""
                 Failed to produce history for db {self.db.name} with args {command_args}""",
                 err,
@@ -329,7 +329,7 @@ class ProvenDB:
             response = self.db.command("forget", {"prepare": command_args})
             return PrepareForgetResponse(response)
         except PyMongoError as err:
-            raise PrepareForgetException(
+            raise PrepareForgetError(
                 f"Failure to prepare a forget operation on db {self.db} with arguments {command_args}",
                 err,
             ) from None
@@ -351,7 +351,7 @@ class ProvenDB:
             response = self.db.command("forget", {"execute": command_args})
             return ExecuteForgetResponse(response)
         except PyMongoError as err:
-            raise PrepareForgetException(
+            raise PrepareForgetError(
                 f"""Failure to execute a forget operation on db {self.db} 
                                         with password {password} and forget_id {forget_id}""",
                 err,
@@ -389,7 +389,7 @@ class ProvenDB:
             response = self.db.command("getDocumentProof", command_args)
             return GetDocumentProofResponse(response)
         except PyMongoError as err:
-            raise GetDocumentProofException(
+            raise GetDocumentProofError(
                 f"""Failed to get proof for documents on {self.db.name} with arguments {command_args}""",
                 err,
             ) from None
@@ -406,7 +406,7 @@ class ProvenDB:
             document = self.db.command("getVersion", 1)
             return GetVersionResponse(document)
         except PyMongoError as err:
-            raise GetVersionException(
+            raise GetVersionError(
                 f"Failure to get version from db {self.db.name}.", pymongo_exception=err
             ) from None
 
@@ -438,7 +438,7 @@ class ProvenDB:
             document = self.db.command(command_args)
             return GetVersionProofResponse(document)
         except PyMongoError as err:
-            raise GetVersionProofException(
+            raise GetVersionProofError(
                 f"Failed to get the given version for proof_id {proof_id} on db {self.db.name}",
                 err,
             )
@@ -455,7 +455,7 @@ class ProvenDB:
             response = self.db.command("listStorage")
             return ListStorageResponse(response)
         except PyMongoError as err:
-            raise ListStorageException(
+            raise ListStorageError(
                 f"Failed to list storage sizes for db {self.db.name}", err
             )
 
@@ -494,7 +494,7 @@ class ProvenDB:
             document: Dict[str, Any] = self.db.command({"listVersions": command_args})
             return ListVersionsResponse(document)
         except PyMongoError as err:
-            raise ListVersionException(
+            raise ListVersionError(
                 f"Unable to get version list from {self.db.name} with arguments {command_args}.",
                 err,
             ) from None
@@ -510,7 +510,7 @@ class ProvenDB:
             response = self.db.command("rollback")
             return RollbackResponse(response)
         except PyMongoError as err:
-            raise RollbackException(f"Failed to rollback {self.db.name}", err) from None
+            raise RollbackError(f"Failed to rollback {self.db.name}", err) from None
 
     def set_version(
         self, date: Union[str, int, datetime.datetime]
@@ -528,7 +528,7 @@ class ProvenDB:
             document = self.db.command("setVersion", date)
             return SetVersionResponse(document)
         except PyMongoError as e:
-            raise SetVersionException(
+            raise SetVersionError(
                 f"Failure to set version {date} on db {self.db.name}"
                 + f"with date {date}.",
                 e,
@@ -545,7 +545,7 @@ class ProvenDB:
             response = self.db.command("showMetadata", True)
             return ShowMetadataResponse(response)
         except PyMongoError as err:
-            raise ShowMetadataException(
+            raise ShowMetadataError(
                 f"Failed to show metatdata on db {self.db.name}", err
             )
 
@@ -560,7 +560,7 @@ class ProvenDB:
             response = self.db.command("showMetadata", False)
             return HideMetadataResponse(response)
         except PyMongoError as err:
-            raise HideMetadataException(
+            raise HideMetadataError(
                 f"Failed to hide metatdata on db {self.db.name}", err
             )
 
@@ -603,7 +603,7 @@ class ProvenDB:
             response = self.db.command(command_args)
             return SubmitProofResponse(response)
         except PyMongoError as err:
-            raise SubmitProofException(
+            raise SubmitProofError(
                 f"Failed to submit proof with arguments {command_args} on {self.db.name} ",
                 err,
             )
@@ -628,6 +628,6 @@ class ProvenDB:
             response = self.db.command(command_args)
             return VerifyProofResponse(response)
         except PyMongoError as err:
-            raise VerifyProofException(
+            raise VerifyProofError(
                 f"Failed to verify proof {proof_id} on {self.db.name}", err
             )
