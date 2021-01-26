@@ -37,7 +37,7 @@ class SuccessfulDocumentProof(DocumentProof):
         super().__init__(document)
         self.collection: str = self["collection"]
         self.scope: str = self["scope"]
-        self.provenDbId: str = self["ProvenDbId"]
+        self.provenDbId: ObjectId = self["provenDbId"]
         self.documentId: str = self["documentId"]
         self.version: int = self["version"]
         self.status: str = self["status"]
