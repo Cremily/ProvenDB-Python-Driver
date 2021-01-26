@@ -1,3 +1,4 @@
+from pymongo.errors import PyMongoError
 from pyproven.storage import ListStorageResponse
 from typing import List
 
@@ -7,7 +8,6 @@ import os
 
 from pymongo import MongoClient
 
-from pyproven.exceptions import BulkLoadError, SetVersionError
 from pyproven import ProvenDB
 
 import time
@@ -41,10 +41,7 @@ class ProvenDBTests(unittest.TestCase):
             status = self.pdb.bulk_load_status()
             self.assertTrue(status.status == "off")
         except Exception as err:
-            try:
-                self.pdb.bulk_load_kill()
-            except BulkLoadError:
-                pass
+            self.pdb.bulk_load_kill()
             raise err
     def test_get_version(self):
         """PyProven can get the version the DB is set to."""
@@ -65,7 +62,7 @@ class ProvenDBTests(unittest.TestCase):
         """PyProven will raise the correct exception when given an impossible version number."""
         version = self.pdb.set_version("current")
         impossible_version = version.version + 1000
-        with self.assertRaises(SetVersionError):
+        with self.assertRaises(PyMongoError):
             self.pdb.set_version(impossible_version)
 
     def test_list_versions_noargs(self):
