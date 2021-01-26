@@ -62,8 +62,8 @@ class GetVersionProofResponse(ProvenResponse):
 
     def __init__(self, document: Dict[str, Any]):
         super().__init__(document)
-        self['proofs'] = [VersionProof(proof) for proof in self["proofs"]]
-        self.proofs = self['proofs']
+        self["proofs"] = [VersionProof(proof) for proof in self["proofs"]]
+        self.proofs = self["proofs"]
 
 
 class VersionProof(ProvenDocument):
