@@ -3,12 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-ProvenDB Python Driver
-====================================
+PyProven: A Python-driver for ProvenDB
+========================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-.. autoclass:: database.ProvenDB
 
-I
+   ProvenDB
+
+PyProven is a Python module that wraps the original PyMongo driver,
+adding all ProvenDB functionality with type-hinting,
+ProvenDB-specific data classes and exceptions.
+Python developers should feel comfortable making
+ProvenDB applications in the same way as they make existing PyMongo applications.

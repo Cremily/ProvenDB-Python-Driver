@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>ProvenDB &mdash; ProvenDB 1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="PyProven: A Python-driver for ProvenDB" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ProvenDB
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ProvenDB</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ProvenDB</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>ProvenDB</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/ProvenDB.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="provendb">
+<h1>ProvenDB<a class="headerlink" href="#provendb" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyproven.ProvenDB">
+<em class="property">class </em><code class="sig-prename descclassname">pyproven.</code><code class="sig-name descname">ProvenDB</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">database</span><span class="p">:</span> <span class="n">pymongo.database.Database</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyproven.ProvenDB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Proven DB Database object that wraps the original pymongo Database object.</p>
+<dl class="py method">
+<dt id="pyproven.ProvenDB.bulk_load_kill">
+<code class="sig-name descname">bulk_load_kill</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.utilities.BulkLoadKillResponse<a class="headerlink" href="#pyproven.ProvenDB.bulk_load_kill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops a bulk load on a database, killing any remaining operations.
+See <a class="reference external" href="https://provendb.readme.io/docs/bulkload">https://provendb.readme.io/docs/bulkload</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BulkLoadNotStartedException</strong> – Error when attempting to kill a bulk load when one hasn’t started.</p></li>
+<li><p><strong>BulkLoadException</strong> – Default exception when database fails to kill a bulkload.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict-like object containing the response from the database.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>BulkLoadKillResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.bulk_load_start">
+<code class="sig-name descname">bulk_load_start</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.utilities.BulkLoadStartResponse<a class="headerlink" href="#pyproven.ProvenDB.bulk_load_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a bulk load on the database. Bulk loads allow multiple inserts without incrementing the version.
+See <a class="reference external" href="https://provendb.readme.io/docs/bulkload">https://provendb.readme.io/docs/bulkload</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>BulkLoadException</strong> – A PyProven exception raised when db fails to start bulk loading, usually because the db is already bulk loading.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict-like object that holds the current version.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>BulkLoadStartResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.bulk_load_status">
+<code class="sig-name descname">bulk_load_status</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.utilities.BulkLoadStatusResponse<a class="headerlink" href="#pyproven.ProvenDB.bulk_load_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current bulk load status of the database.
+See <a class="reference external" href="https://provendb.readme.io/docs/bulkload">https://provendb.readme.io/docs/bulkload</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>BulkLoadException</strong> – Generic error when database fails to check bulk load status.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict-like object holding the current bulk load status of the database.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>BulkLoadStatusResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.bulk_load_stop">
+<code class="sig-name descname">bulk_load_stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.utilities.BulkLoadStopResponse<a class="headerlink" href="#pyproven.ProvenDB.bulk_load_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops a bulk load on a database, failing if there is any outstanding operations.
+See <a class="reference external" href="https://provendb.readme.io/docs/bulkload">https://provendb.readme.io/docs/bulkload</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BulkLoadNotStartedException</strong> – Error when trying to stop a bulk load when the database is not bulk loading.</p></li>
+<li><p><strong>BulkLoadException</strong> – A PyProven exception when failing to stop a bulk load.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict-like object representing the response from the database.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>BulkLoadStopResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.compact_versions">
+<code class="sig-name descname">compact_versions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start_version</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">end_version</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">destroy_proofs</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyproven.versions.CompactResponse<a class="headerlink" href="#pyproven.ProvenDB.compact_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compacts all proofs, versions and documents in the db between two given versions,
+deleting all data that only exists between the two versions.
+See <a class="reference external" href="https://provendb.readme.io/docs/compact">https://provendb.readme.io/docs/compact</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_version</strong> (<em>int</em>) – The first version to compact from.</p></li>
+<li><p><strong>end_version</strong> (<em>int</em>) – The last version to compact to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>CompactException</strong> – pyproven exception when ProvenDB fails to compact between the two given versions.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object containing the number of deleted proofs, versions and documents.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>CompactResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.create_ignored">
+<code class="sig-name descname">create_ignored</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">collection</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pyproven.utilities.CreateIgnoredResponse<a class="headerlink" href="#pyproven.ProvenDB.create_ignored" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a collection to be ignored; it will  be identical among versions, not include metadata,
+and not included in proofs.
+See <a class="reference external" href="https://provendb.readme.io/docs/ignored-collections">https://provendb.readme.io/docs/ignored-collections</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>collection</strong> (<em>str</em>) – The name of the collection to be ignored.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict-like object with the time of the operation.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>CreateIgnoredException</strong> – pyproven exception when database fails to ignore the given collection.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>CreateIgnoredResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.doc_history">
+<code class="sig-name descname">doc_history</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">collection</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">projection</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyproven.history.DocumentHistoryResponse<a class="headerlink" href="#pyproven.ProvenDB.doc_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the document history of a filtered collection.
+See <a class="reference external" href="https://provendb.readme.io/docs/dochistory">https://provendb.readme.io/docs/dochistory</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> (<em>str</em>) – Name of collection to find history.</p></li>
+<li><p><strong>filter</strong> (<em>Dict</em><em>[</em><em>str</em><em>,</em><em>Any</em><em>]</em>) – MongoDB document filter to search for specific documents in the collection.</p></li>
+<li><p><strong>projection</strong> (<em>Dict</em><em>[</em><em>str</em><em>,</em><em>Any</em><em>]</em><em>, </em><em>optional</em>) – A projection document that specifies fields to retrieve from documents.
+defaults to returning all fields.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>DocumentHistoryException</strong> – pyproven exception when ProvenDB fails to retrieve
+the given document history.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object representing the ProvenDB return document.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>DocumentHistoryResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.forget_execute">
+<code class="sig-name descname">forget_execute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">forget_id</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">password</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pyproven.utilities.ExecuteForgetResponse<a class="headerlink" href="#pyproven.ProvenDB.forget_execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes a prepared forget operation, deleting data but preserving hashes.
+See <a class="reference external" href="https://provendb.readme.io/docs/forget">https://provendb.readme.io/docs/forget</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forget_id</strong> (<em>int</em>) – Id given in prepare operation.</p></li>
+<li><p><strong>password</strong> (<em>str</em>) – Password given in prepare operation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>PrepareForgetException</strong> – Generic exception when database fails to execute a forget operation.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object returning the status and summary of the forget operation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ExecuteForgetResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.forget_prepare">
+<code class="sig-name descname">forget_prepare</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">collection</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">min_version</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max_version</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">inclusive_range</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyproven.utilities.PrepareForgetResponse<a class="headerlink" href="#pyproven.ProvenDB.forget_prepare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares an operation to forget a set of documents. This will erase the data but preserve hashes so as to verify proofs.
+See <a class="reference external" href="https://provendb.readme.io/docs/forget">https://provendb.readme.io/docs/forget</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>collection</strong> (<em>str</em>) – The name of the collection to forget documents from.</p></li>
+<li><p><strong>filter</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>) – A filter that choses the specific documents to forget.</p></li>
+<li><p><strong>min_version</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – Minimum version to forget documents in. Defaults to first version of database.</p></li>
+<li><p><strong>max_version</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – Maximum verstion to forget documents to. Defaults to current version of database.</p></li>
+<li><p><strong>inclusive_range</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true, forget documents that ONLY exist between the two versions, defaults to True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>PrepareForgetException</strong> – Generic error when failing to prepare forget operation on database.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object that holds the forget password as well as forget summary.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>PrepareForgetResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.get_document_proof">
+<code class="sig-name descname">get_document_proof</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">collection</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">version</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">proof_format</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyproven.proofs.GetDocumentProofResponse<a class="headerlink" href="#pyproven.ProvenDB.get_document_proof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filters documents in a collection and returns any proofs of those documents for a given version.
+See: <a class="reference external" href="https://provendb.readme.io/docs/getdocumentproof">https://provendb.readme.io/docs/getdocumentproof</a>
+:param collection: The name of the collection to filter.
+:type collection: str
+:param filter: A mongodb filter that subsets the collection.
+:type filter: Dict[str, Any]
+:param version: The version number to fetch proofs for.
+:type version: int
+:param proof_format: The format of the proof, either ‘binary’ or ‘json’, defaults to “json”
+:type proof_format: str
+:raises GetDocumentProofException: [description]
+:return: A dict-like object containing an array of document proof documents.
+:rtype: GetDocumentProofResponse</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.get_version">
+<code class="sig-name descname">get_version</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.versions.GetVersionResponse<a class="headerlink" href="#pyproven.ProvenDB.get_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the version the db is set to.
+See <a class="reference external" href="https://provendb.readme.io/docs/getversion">https://provendb.readme.io/docs/getversion</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object representing the ProvenDB return document.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>GetVersionException</strong> – pyproven exception when db fails to return the current version.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>GetVersionData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.get_version_proof">
+<code class="sig-name descname">get_version_proof</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">proof_id</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">proof_format</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">list_collections</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyproven.proofs.GetVersionProofResponse<a class="headerlink" href="#pyproven.ProvenDB.get_version_proof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets a proof for a specific database version.
+See <a class="reference external" href="https://provendb.readme.io/docs/getproof">https://provendb.readme.io/docs/getproof</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>proof_id</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>int</em><em>]</em>) – Either a string matching a proofId, or a version number.</p></li>
+<li><p><strong>proof_format</strong> (<em>str</em><em>, </em><em>optional</em>) – Format type of proof, either ‘binary’ or ‘json’, defaults to json</p></li>
+<li><p><strong>list_collections</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True all collections in proof are listed, defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>GetVersionProofException</strong> – </p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object holding an array of proofs.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>GetVersionProofResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.hide_metadata">
+<code class="sig-name descname">hide_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.utilities.HideMetadataResponse<a class="headerlink" href="#pyproven.ProvenDB.hide_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes the db to hide ProvenDB metadata on documents.
+See <a class="reference external" href="https://provendb.readme.io/docs/showmetadata">https://provendb.readme.io/docs/showmetadata</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object holding the ‘ok’ response from the database.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>HideMetadataResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.list_storage">
+<code class="sig-name descname">list_storage</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.storage.ListStorageResponse<a class="headerlink" href="#pyproven.ProvenDB.list_storage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the storage size for each collection in the db.
+See <a class="reference external" href="https://provendb.readme.io/docs/liststorage">https://provendb.readme.io/docs/liststorage</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object holding a list of dict-like objects,</p>
+</dd>
+</dl>
+<p>each containg a single ‘collection_name: collection_storage_size’ key-value pair.
+:rtype: ListStorageResponse</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.list_versions">
+<code class="sig-name descname">list_versions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start_date</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>datetime.datetime<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">end_date</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>datetime.datetime<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">limit</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sort_direction</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyproven.versions.ListVersionsResponse<a class="headerlink" href="#pyproven.ProvenDB.list_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of versions given a search parameter.
+See <a class="reference external" href="https://provendb.readme.io/docs/listversions">https://provendb.readme.io/docs/listversions</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_date</strong> (<em>Optional</em><em>[</em><em>datetime.datetime</em><em>]</em>) – Specifies first date to retrieve versions, defaults to 24 hours from now</p></li>
+<li><p><strong>end_date</strong> (<em>Optional</em><em>[</em><em>datetime.datetime</em><em>]</em>) – Last date to retrieve documents, defaults to now</p></li>
+<li><p><strong>limit</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – Number of version documents to retrieve, defaults to 10</p></li>
+<li><p><strong>sort_direction</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – -1 to retrieve versions in descending order, 1 ascending order. Defaults to -1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ListVersionException</strong> – pyproven exception when fails to retrieve version list.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object representing the ProvenDB response document.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ListVersionsResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.rollback">
+<code class="sig-name descname">rollback</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.utilities.RollbackResponse<a class="headerlink" href="#pyproven.ProvenDB.rollback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rolls back the database to the last valid version, cancelling any current insert, update or delete operations.
+See <a class="reference external" href="https://provendb.readme.io/docs/rollback">https://provendb.readme.io/docs/rollback</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object holding the ‘db_name: db_version’ pair the db has been rolled back to.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>RollbackResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.set_version">
+<code class="sig-name descname">set_version</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">date</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>int<span class="p">, </span>datetime.datetime<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; pyproven.versions.SetVersionResponse<a class="headerlink" href="#pyproven.ProvenDB.set_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the database version to a given version identifier.
+See <a class="reference external" href="https://provendb.readme.io/docs/setversion">https://provendb.readme.io/docs/setversion</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>date</strong> (<em>Union</em><em>[</em><em>str</em><em>,</em><em>int</em><em>,</em><em>datetime</em><em>]</em>) – Version number, string literal ‘current’, or <code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code> object.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>SetVersionException</strong> – pyproven exception when db fails to set the given version.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object representing the provenDB return document.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>SetVersionData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.show_metadata">
+<code class="sig-name descname">show_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyproven.utilities.ShowMetadataResponse<a class="headerlink" href="#pyproven.ProvenDB.show_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Causes the db to also show ProvenDB metadata on documents.
+See <a class="reference external" href="https://provendb.readme.io/docs/showmetadata">https://provendb.readme.io/docs/showmetadata</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict-like object holding the ‘ok’ response from the database.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>ShowMetadataResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.submit_proof">
+<code class="sig-name descname">submit_proof</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">version</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">collections</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">anchor_type</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_checks</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyproven.proofs.SubmitProofResponse<a class="headerlink" href="#pyproven.ProvenDB.submit_proof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a proof for a version and inserts it on the blockchain.
+See <a class="reference external" href="https://provendb.readme.io/docs/submitproof">https://provendb.readme.io/docs/submitproof</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>version</strong> (<em>int</em>) – The version number to be proved.</p></li>
+<li><p><strong>collections</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em><em>,</em>) – The collections to be included, defaults to all.</p></li>
+<li><p><strong>filter</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em><em>]</em><em>, </em><em>optional</em>) – A MongoDB filter that selects documents within the collections, defaults to all documents.</p></li>
+<li><p><strong>anchor_type</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em><em>, </em><em>optional</em>) – The blockchain used to anchor the proof, defaults to ETH_MAINNET.</p></li>
+<li><p><strong>n_checks</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em><em>, </em><em>optional</em>) – Number of times the proof hash will be recalculated</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict-like object holding the proof data.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>SubmitProofResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyproven.ProvenDB.verify_proof">
+<code class="sig-name descname">verify_proof</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">proof_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">format</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; pyproven.proofs.VerifyProofResponse<a class="headerlink" href="#pyproven.ProvenDB.verify_proof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies a proof previously uploaded to the blockchain.
+See <a class="reference external" href="https://provendb.readme.io/docs/verifyproof">https://provendb.readme.io/docs/verifyproof</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>proof_id</strong> (<em>str</em>) – The id of the proof to validate.</p></li>
+<li><p><strong>format</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – Format of the proof document, defaults to json</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict-like object holding the proof and proof information.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>VerifyProofResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="index.html" class="btn btn-neutral float-left" title="PyProven: A Python-driver for ProvenDB" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, Mackenzie Harrison.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
