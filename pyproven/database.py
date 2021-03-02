@@ -117,10 +117,8 @@ class ProvenDB:
         :rtype: BulkLoadStartResponse
         """
         try:
-            document: Dict[str, Any] = self.db.command(
-                "bulkLoad", BulkLoadEnums.START.value
-            )
-            return BulkLoadStartResponse(document)
+            response = self.db.command("bulkLoad", BulkLoadEnums.START.value)
+            return BulkLoadStartResponse(response)
         except PyMongoError as err:
             if (
                 extract_error_info(err)["errmsg"]
@@ -139,8 +137,8 @@ class ProvenDB:
         :return: A dict-like object representing the response from the database.
         :rtype: BulkLoadStopResponse
         """
-        document: Dict[str, Any] = self.db.command("bulkLoad", BulkLoadEnums.STOP.value)
-        return BulkLoadStopResponse(document)
+        response = self.db.command("bulkLoad", BulkLoadEnums.STOP.value)
+        return BulkLoadStopResponse(response)
 
     def bulk_load_kill(self) -> BulkLoadKillResponse:
         """Stops a bulk load on a database, killing any remaining operations.
@@ -151,8 +149,8 @@ class ProvenDB:
         :return: A dict-like object containing the response from the database.
         :rtype: BulkLoadKillResponse
         """
-        document: Dict[str, Any] = self.db.command("bulkLoad", BulkLoadEnums.KILL.value)
-        return BulkLoadKillResponse(document)
+        response = self.db.command("bulkLoad", BulkLoadEnums.KILL.value)
+        return BulkLoadKillResponse(response)
 
     def bulk_load_status(self) -> BulkLoadStatusResponse:
         """Returns the current bulk load status of the database.
@@ -162,10 +160,8 @@ class ProvenDB:
         :return: A dict-like object holding the current bulk load status of the database.
         :rtype: BulkLoadStatusResponse
         """
-        document: Dict[str, Any] = self.db.command(
-            "bulkLoad", BulkLoadEnums.STATUS.value
-        )
-        return BulkLoadStatusResponse(document)
+        response = self.db.command("bulkLoad", BulkLoadEnums.STATUS.value)
+        return BulkLoadStatusResponse(response)
 
     def compact_versions(
         self,
@@ -185,7 +181,7 @@ class ProvenDB:
         :return: A dict-like object containing the number of deleted proofs, versions and documents.
         :rtype: CompactResponse
         """
-        command_args = {"startVersion": start_version, "endVersion": end_version}
+        command_args = SON({"startVersion": start_version, "endVersion": end_version})
         if destroy_proofs:
             command_args.update({"destroyProofs": destroy_proofs})
         try:
@@ -194,10 +190,6 @@ class ProvenDB:
         except PyMongoError as err:
             error_msg = extract_error_info(err)["errmsg"]
             if (
-                error_msg
-            ) == "The 'startVersion' should not be bigger than the 'endVersion'":
-                raise CompactValueError(err) from None
-            elif (
                 error_msg
                 == "There must be a full proof above the range to be compacted"
             ):
@@ -237,11 +229,11 @@ class ProvenDB:
         :return: A dict-like object representing the ProvenDB return document.
         :rtype: DocumentHistoryResponse
         """
-        command_args = {"collection": collection, "filter": filter}
+        command_args = SON({"collection": collection, "filter": filter})
         if projection:
             command_args.update({"projection": projection})
-        document = self.db.command("docHistory", command_args)
-        return DocumentHistoryResponse(document)
+        response = self.db.command("docHistory", command_args)
+        return DocumentHistoryResponse(response)
 
     def forget_prepare(
         self,
@@ -268,10 +260,12 @@ class ProvenDB:
         :return: A dict-like object that holds the forget password as well as forget summary.
         :rtype: PrepareForgetResponse
         """
-        command_args: Dict[str, Any] = {
-            "collection": collection,
-            "filter": filter,
-        }
+        command_args = SON(
+            {
+                "collection": collection,
+                "filter": filter,
+            }
+        )
         if min_version:
             command_args.update({"minVersion": min_version})
         if max_version:
@@ -293,7 +287,7 @@ class ProvenDB:
         :return: A dict-like object returning the status and summary of the forget operation.
         :rtype: ExecuteForgetResponse
         """
-        command_args: Dict[str, Any] = {"forgetId": forget_id, "password": password}
+        command_args = SON({"forgetId": forget_id, "password": password})
         response = self.db.command("forget", {"execute": command_args})
         return ExecuteForgetResponse(response)
 
@@ -318,11 +312,13 @@ class ProvenDB:
         :return: A dict-like object containing an array of document proof documents.
         :rtype: GetDocumentProofResponse
         """
-        command_args: Dict[str, Any] = {
-            "collection": collection,
-            "filter": filter,
-            "version": version,
-        }
+        command_args = SON(
+            {
+                "collection": collection,
+                "filter": filter,
+                "version": version,
+            }
+        )
         if proof_format:
             command_args.update({"proofFormat": proof_format})
         response = self.db.command("getDocumentProof", command_args)
@@ -336,8 +332,8 @@ class ProvenDB:
         :raises GetVersionException: pyproven exception when db fails to return the current version.
         :rtype: GetVersionData
         """
-        document = self.db.command("getVersion", 1)
-        return GetVersionResponse(document)
+        response = self.db.command("getVersion", 1)
+        return GetVersionResponse(response)
 
     def get_version_proof(
         self,
@@ -363,8 +359,8 @@ class ProvenDB:
             command_args.update({"format": proof_format})
         if list_collections:
             command_args.update({"listCollections": list_collections})
-        document = self.db.command(command_args)
-        return GetVersionProofResponse(document)
+        response = self.db.command(command_args)
+        return GetVersionProofResponse(response)
 
     def list_storage(self) -> ListStorageResponse:
         """Fetches the storage size for each collection in the db.
@@ -399,7 +395,7 @@ class ProvenDB:
         :return: A dict-like object representing the ProvenDB response document.
         :rtype: ListVersionsResponse
         """
-        command_args: Dict[str, Any] = {}
+        command_args = SON()
         if start_date:
             command_args.update({"startDate": start_date})
         if end_date:
@@ -408,8 +404,8 @@ class ProvenDB:
             command_args.update({"limit": limit})
         if sort_direction:
             command_args.update({"sortDirection": sort_direction})
-        document: Dict[str, Any] = self.db.command({"listVersions": command_args})
-        return ListVersionsResponse(document)
+        response = self.db.command({"listVersions": command_args})
+        return ListVersionsResponse(response)
 
     def rollback(self) -> RollbackResponse:
         """Rolls back the database to the last valid version, cancelling any current insert, update or delete operations.
@@ -433,8 +429,8 @@ class ProvenDB:
         :return: A dict-like object representing the provenDB return document.
         :rtype: SetVersionData
         """
-        document = self.db.command("setVersion", date)
-        return SetVersionResponse(document)
+        response = self.db.command("setVersion", date)
+        return SetVersionResponse(response)
 
     def show_metadata(self) -> ShowMetadataResponse:
         """Causes the db to also show ProvenDB metadata on documents.
@@ -480,8 +476,6 @@ class ProvenDB:
         :return: A dict-like object holding the proof data.
         :rtype: SubmitProofResponse
         """
-        # Must use SON as the command name is part of the document, not {command_name: {commands}}.
-        # This means the order of keys matters, and Python dicts are not ordered.
         command_args: SON = SON({"submitProof": version})
         if collections:
             command_args.update({"collections": collections})
